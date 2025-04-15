@@ -1,5 +1,10 @@
 from datetime import date
 import random
+from app.gemini_agent import GeminiAgent
+
+agent = GeminiAgent()
+agent_context = "You are MindMate, a kind mood assistant who responds with empathy."
+
 
 # Example activity lists by mood
 activities = {
@@ -11,10 +16,14 @@ activities = {
 # Store user's daily activity and rating
 activity_log = {}
 
-def get_daily_activity(user_id, mood="neutral"):
+def get_daily_activity(user_id, mood):
     today = str(date.today())
+
+    prompt = f"{agent_context}\nSuggest some mindful activity based on the user's mode: {mood} in a form of list"
+    ai_response = agent.ask(prompt)
+
     if user_id not in activity_log or today not in activity_log[user_id]:
-        activity = random.choice(activities[mood])
+        activity = ai_response
         activity_log.setdefault(user_id, {})[today] = {"activity": activity, "rating": None}
     return activity_log[user_id][today]["activity"]
 

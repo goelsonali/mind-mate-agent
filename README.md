@@ -36,4 +36,5 @@
 
     2. (Optional) To test the post endpoint using command line in user-friendly way
         - pip install httpie
-        - http POST http://127.0.0.1:8000/chat user_id="user123" message="Hello!" 
+        - http POST http://localhost:8000/chat user_id="user123" message="Hello!"
+        - http GET http://localhost:8000/daily-activity/user123?mood=excited
