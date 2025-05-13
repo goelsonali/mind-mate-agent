@@ -1,6 +1,9 @@
 from datetime import date
 import random
-from app.gemini_agent import GeminiAgent
+import json
+import re
+from app.backend.gemini_agent import GeminiAgent
+
 
 agent = GeminiAgent()
 agent_context = "You are MindMate, a kind mood assistant who responds with empathy."
@@ -19,11 +22,11 @@ activity_log = {}
 def get_daily_activity(user_id, mood):
     today = str(date.today())
 
-    prompt = f"{agent_context}\nSuggest some mindful activity based on the user's mode: {mood} in a form of list"
+    prompt = f"{agent_context}\nSuggest 2 mindful activities for someone feeling : {mood}. Return only a JSON list with fields 'title' and 'description'."
     ai_response = agent.ask(prompt)
 
     if user_id not in activity_log or today not in activity_log[user_id]:
-        activity = ai_response
+        activity = extract_json(ai_response)
         activity_log.setdefault(user_id, {})[today] = {"activity": activity, "rating": None}
     return activity_log[user_id][today]["activity"]
 
@@ -33,3 +36,14 @@ def rate_activity(user_id, rating):
         activity_log[user_id][today]["rating"] = rating
         return True
     return False
+
+def extract_json(response_text: str) -> list:
+    try:
+        # Find the JSON part using regex
+        match = re.search(r"\[\s*{.*?}\s*]", response_text, re.DOTALL)
+        if match:
+            # Parse and return the JSON list
+            return json.loads(match.group(0))
+        return []
+    except json.JSONDecodeError:
+        return []

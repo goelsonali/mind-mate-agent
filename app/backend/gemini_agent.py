@@ -10,7 +10,7 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 class GeminiAgent:
     def __init__(self):
-        self.model = genai.GenerativeModel("gemini-1.5-pro-latest")
+        self.model = genai.GenerativeModel("gemini-2.0-flash")
 
     def ask(self, prompt):
         try:

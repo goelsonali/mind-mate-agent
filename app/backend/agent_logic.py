@@ -1,7 +1,7 @@
-from app.memory_manager import update_memory, get_user_data
-from app.mood_analyser import detect_mood
-from app.activity_manager import get_daily_activity
-from app.gemini_agent import GeminiAgent
+from app.backend.memory_manager import update_memory, get_user_data
+from app.backend.mood_analyser import detect_mood
+from app.backend.activity_manager import get_daily_activity
+from app.backend.gemini_agent import GeminiAgent
 
 agent = GeminiAgent()
 agent_context = "You are MindMate, a kind mood assistant who responds with empathy."
