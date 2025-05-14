@@ -11,6 +11,12 @@ RUN npm install --platform=linux --no-optional
 # Copy source code
 COPY . .
 
+# Fix permissions for all executables in node_modules
+RUN find /app/node_modules -type f -name "*" -exec chmod +x {} \;
+RUN find /app/node_modules -type d -exec chmod 755 {} \;
+RUN chmod -R 755 /app/node_modules/.bin
+RUN chmod -R 755 /app/node_modules/@esbuild
+
 # Build the app
 RUN npm run build
 
@@ -20,11 +26,15 @@ FROM nginx:alpine
 # Copy built files from build stage to nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy custom nginx config for Cloud Run
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-# Expose port
-EXPOSE 80
+# Set environment variable for Nginx template processing
+ENV PORT=8080
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Create entrypoint script to handle dynamic port
+RUN printf '#!/bin/sh\n\nenvsubst "\$PORT" < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf\nnginx -g "daemon off;"\n' > /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
+
+# Start Nginx with dynamic port configuration
+CMD ["/docker-entrypoint.sh"]

@@ -1,52 +1,119 @@
+# Set a longer timeout for the build (30 minutes)
+timeout: 1800s
+
+# Substitution variables with defaults
+substitutions:
+  _DEPLOY_FRONTEND: 'true'
+  _DEPLOY_BACKEND: 'true'
+  _REGION: 'europe-west2'
+
+# Enable explicit logging
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
+  # Log build start for debugging
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args: ['-c', 'echo "Starting Mind Mate build process for $PROJECT_ID"']
+  
   # Frontend deployment
   # Build the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/mindmate-frontend:$COMMIT_SHA', '-f', './app/frontend/Dockerfile', './app/frontend']
+    args: ['build', '-t', 'europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/frontend:latest', '-f', './app/frontend/Dockerfile', './app/frontend']
+    id: 'build-frontend'
+    waitFor: ['-']
+    # Skip if _DEPLOY_FRONTEND is false
+    env:
+      - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
+    script: |
+      if [ "$_DEPLOY_FRONTEND" = "false" ]; then
+        echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
+        exit 0
+      fi
+      docker build -t europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/frontend:latest -f ./app/frontend/Dockerfile ./app/frontend
   
   # Push the frontend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/mindmate-frontend:$COMMIT_SHA']
+    id: 'push-frontend'
+    waitFor: ['build-frontend']
+    # Only run if _DEPLOY_FRONTEND is true
+    env:
+      - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
+    script: |
+      if [ "$_DEPLOY_FRONTEND" = "false" ]; then
+        echo "Skipping frontend push as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
+        exit 0
+      fi
+      docker push europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/frontend:latest
   
   # Deploy frontend container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'mindmate-frontend'
-      - '--image'
-      - 'gcr.io/$PROJECT_ID/mindmate-frontend:$COMMIT_SHA'
-      - '--region'
-      - 'europe-west2'  # London region
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
+    id: 'deploy-frontend'
+    waitFor: ['push-frontend']
+    # Only run if _DEPLOY_FRONTEND is true
+    env:
+      - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
+    script: |
+      if [ "$_DEPLOY_FRONTEND" = "false" ]; then
+        echo "Skipping frontend deployment as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
+        exit 0
+      fi
+      gcloud run deploy mindmate-frontend \
+        --image europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/frontend:latest \
+        --region $_REGION \
+        --platform managed \
+        --allow-unauthenticated
 
   # Backend deployment
   # Build the backend container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/mindmate-backend:$COMMIT_SHA', '-f', './app/backend/Dockerfile', './app/backend']
+    args: ['build', '-t', 'europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/backend:latest', '-f', './app/backend/Dockerfile', './app/backend']
+    id: 'build-backend'
+    waitFor: ['-']
+    # Only run if _DEPLOY_BACKEND is true
+    env:
+      - '_DEPLOY_BACKEND=$_DEPLOY_BACKEND'
+    script: |
+      if [ "$_DEPLOY_BACKEND" = "false" ]; then
+        echo "Skipping backend build as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
+        exit 0
+      fi
+      docker build -t europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/backend:latest -f ./app/backend/Dockerfile ./app/backend
   
   # Push the backend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/mindmate-backend:$COMMIT_SHA']
+    id: 'push-backend'
+    waitFor: ['build-backend']
+    # Only run if _DEPLOY_BACKEND is true
+    env:
+      - '_DEPLOY_BACKEND=$_DEPLOY_BACKEND'
+    script: |
+      if [ "$_DEPLOY_BACKEND" = "false" ]; then
+        echo "Skipping backend push as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
+        exit 0
+      fi
+      docker push europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/backend:latest
   
   # Deploy backend container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'mindmate-backend'
-      - '--image'
-      - 'gcr.io/$PROJECT_ID/mindmate-backend:$COMMIT_SHA'
-      - '--region'
-      - 'europe-west2'  # London region
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
+    id: 'deploy-backend'
+    waitFor: ['push-backend']
+    # Only run if _DEPLOY_BACKEND is true
+    env:
+      - '_DEPLOY_BACKEND=$_DEPLOY_BACKEND'
+    script: |
+      if [ "$_DEPLOY_BACKEND" = "false" ]; then
+        echo "Skipping backend deployment as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
+        exit 0
+      fi
+      gcloud run deploy mindmate-backend \
+        --image europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/backend:latest \
+        --region $_REGION \
+        --platform managed \
+        --memory 1Gi \
+        --allow-unauthenticated
 
 images:
-  - 'gcr.io/$PROJECT_ID/mindmate-frontend:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/mindmate-backend:$COMMIT_SHA'
+  - 'europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/frontend:latest'
+  - 'europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/backend:latest'

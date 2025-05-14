@@ -27,7 +27,62 @@ MindMate is an AI-powered mental health companion designed to help users track t
 ## Architecture Diagram
 
 ```mermaid
+flowchart TD
+    subgraph Users
+        U[User] --> FE
+    end
 
+    subgraph Frontend
+        FE[Cloud Run Frontend]
+    end
+
+    subgraph Backend
+        API[Cloud Run Backend API]
+    end
+
+    subgraph Database
+        FS[Firestore]
+        CS[Cloud Storage]
+    end
+
+    subgraph AI_Agents
+        MA[Mood Analysis Agent]
+        ARA[Activity Recommendation Agent]
+        FPA[Feedback Processing Agent]
+        PTA[Progress Tracking Agent]
+        CA[Coordinator Agent]
+    end
+
+    subgraph GCP_Services
+        VA[Vertex AI]
+        GA[Gemini API]
+        PS[Pub/Sub]
+        CW[Cloud Workflows]
+    end
+
+    FE <--> API
+    API <--> CA
+    
+    CA <--> MA
+    CA <--> ARA
+    CA <--> FPA
+    CA <--> PTA
+    
+    MA <--> VA
+    MA <--> GA
+    ARA <--> VA
+    ARA <--> FS
+    FPA <--> FS
+    PTA <--> FS
+
+    API <--> FS
+    API <--> CS
+    
+    MA <--> PS
+    ARA <--> PS
+    FPA <--> PS
+    PTA <--> PS
+    PS <--> CW
 ```
 
 ## Core Components
