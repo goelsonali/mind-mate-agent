@@ -20,7 +20,6 @@ steps:
   # Frontend deployment
   # Build the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/frontend:latest', '-f', './app/frontend/Dockerfile', './app/frontend']
     id: 'build-frontend'
     waitFor: ['-']
     # Skip if _DEPLOY_FRONTEND is false
@@ -68,7 +67,6 @@ steps:
   # Backend deployment
   # Build the backend container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'europe-west2-docker.pkg.dev/$PROJECT_ID/mindmate/backend:latest', '-f', './app/backend/Dockerfile', './app/backend']
     id: 'build-backend'
     waitFor: ['-']
     # Only run if _DEPLOY_BACKEND is true
