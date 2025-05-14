@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant MoodAgent
+    participant ActivityAgent
+    participant FeedbackAgent
+    participant Database
+    
+    User->>Frontend: Input mood state
+    Frontend->>Backend: Send mood data
+    Backend->>MoodAgent: Process mood input
+    MoodAgent->>Database: Store mood analysis
+    Backend->>ActivityAgent: Request recommendations
+    ActivityAgent->>Database: Query activity database
+    ActivityAgent->>Backend: Return matched activities
+    Backend->>Frontend: Send activity suggestions
+    Frontend->>User: Display recommendations
+    User->>Frontend: Select & complete activity
+    Frontend->>Backend: Send activity feedback
+    Backend->>FeedbackAgent: Process activity results
+    FeedbackAgent->>Database: Store effectiveness data
+    Database->>ActivityAgent: Update recommendation model

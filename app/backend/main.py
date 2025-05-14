@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
-from app.backend.agent_logic import process_user_message
-from app.backend.activity_manager import get_daily_activity, rate_activity
-from app.backend.models import MoodEntry
-from app.backend.mood_manager import add_mood, get_mood_history, get_today_mood
-from app.backend.mood_image_generator import generate_mood_collage
+from agent_logic import process_user_message
+from activity_manager import get_daily_activity, rate_activity
+from models import MoodEntry
+from mood_manager import add_mood, get_mood_history, get_today_mood
+from mood_image_generator import generate_mood_collage
 
 app = FastAPI()
 

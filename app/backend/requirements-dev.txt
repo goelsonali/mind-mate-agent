@@ -1,0 +1,31 @@
+# Include production dependencies
+-r requirements.txt
+
+# Testing
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.24.1
+coverage==7.3.2
+
+# Linting and formatting
+black==23.9.1
+isort==5.12.0
+flake8==6.1.0
+mypy==1.5.1
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.6
+
+# Development tools
+pre-commit==3.5.0
+watchdog==3.0.0
+
+# Debugging
+ipython==8.15.0
+ipdb==0.13.13
+
+# Type checking
+types-requests==2.31.0.2
+types-PyYAML==6.0.12.12

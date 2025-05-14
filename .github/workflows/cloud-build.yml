@@ -1,0 +1,37 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering
+
+env:
+  PROJECT_ID: static-concept-459810-q7
+  REGION: europe-west2  # London region
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+        install_components: 'gke-gcloud-auth-plugin'
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        # This secret needs to be created in your GitHub repository settings
+        # It should contain the JSON key of a GCP service account with appropriate permissions
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Build and Deploy with Cloud Build
+      run: |
+        gcloud builds submit --config=cloudbuild.yaml

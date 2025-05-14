@@ -26,12 +26,28 @@ A modern, calming mental health companion app built with React and Vite.
 npm install
 ```
 
-2. Start the development server:
+2. If you encounter a Rollup module error when starting the development server, install the missing module directly:
+```bash
+# Install the missing Rollup module for Windows
+npm install @rollup/rollup-win32-x64-msvc --save-dev
+```
+
+Alternatively, if other issues persist, try cleaning the installation and reinstalling:
+```bash
+# For Windows (PowerShell)
+if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules }
+if (Test-Path package-lock.json) { Remove-Item package-lock.json }
+
+# Reinstall dependencies
+npm install
+```
+
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-3. Build for production:
+4. Build for production:
 ```bash
 npm run build
 ```
