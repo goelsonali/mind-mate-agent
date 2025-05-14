@@ -28,12 +28,17 @@ on:
           - 'us-east1'
 
 env:
-  PROJECT_ID: static-concept-459810-q7
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'static-concept-459810-q7' }}
+  SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT || 'github-actions-mindmate@static-concept-459810-q7.iam.gserviceaccount.com' }}
   REGION: ${{ github.event.inputs.region || 'europe-west2' }}  # Default to London region if not specified
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Add permissions needed for the Workload Identity Federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     
     steps:
     - name: Checkout code
@@ -49,8 +54,8 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         # Use Workload Identity Federation instead of service account keys
-        workload_identity_provider: 'projects/431880575932/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-        service_account: 'github-actions-mindmate@static-concept-459810-q7.iam.gserviceaccount.com'
+        workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER || 'projects/431880575932/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
+        service_account: ${{ env.SERVICE_ACCOUNT }}
         
     - name: Display build information
       run: |

@@ -2,6 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
+ENV PORT=8080
+ENV PYTHONUNBUFFERED=1
+
 # Copy requirements file
 COPY requirements.txt .
 
@@ -11,15 +20,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend code
 COPY . .
 
-# Set environment variable for port (default to 8080 for Cloud Run)
-ENV PORT=8080
 
 # Expose the port the app runs on
 EXPOSE ${PORT}
 
-# Create entrypoint script to use PORT environment variable
-RUN echo '#!/bin/bash\nuvicorn main:app --host 0.0.0.0 --port ${PORT}' > /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
+# Create a startup script
+RUN echo '#!/bin/bash\n\
+echo "Starting FastAPI application on port $PORT"\n\
+uvicorn main:app --host 0.0.0.0 --port $PORT' > /app/start.sh \
+    && chmod +x /app/start.sh
 
 # Command to run the application
-CMD ["/app/entrypoint.sh"]
+CMD ["/app/start.sh"]
