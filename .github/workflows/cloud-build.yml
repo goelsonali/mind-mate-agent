@@ -51,7 +51,7 @@ jobs:
         install_components: 'gke-gcloud-auth-plugin'
     
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
+      uses: 'google-github-actions/auth@v0.4.0'
       with:
         # Use Workload Identity Federation instead of service account keys
         workload_identity_provider: projects/431880575932/locations/global/workloadIdentityPools/github-pool/providers/github-provider
