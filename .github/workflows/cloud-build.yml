@@ -28,8 +28,8 @@ on:
           - 'us-east1'
 
 env:
-  PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'static-concept-459810-q7' }}
-  SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT || 'github-actions-mindmate@static-concept-459810-q7.iam.gserviceaccount.com' }}
+  PROJECT_ID: static-concept-459810-q7
+  SERVICE_ACCOUNT: github-actions-mindmate@static-concept-459810-q7.iam.gserviceaccount.com
   REGION: ${{ github.event.inputs.region || 'europe-west2' }}  # Default to London region if not specified
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         # Use Workload Identity Federation instead of service account keys
-        workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER || 'projects/431880575932/locations/global/workloadIdentityPools/github-pool/providers/github-provider' }}
+        workload_identity_provider: projects/431880575932/locations/global/workloadIdentityPools/github-pool/providers/github-provider
         service_account: ${{ env.SERVICE_ACCOUNT }}
         
     - name: Display build information
