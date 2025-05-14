@@ -1,0 +1,100 @@
+:root {
+  --bg-color: #2D254C;             /* Deep Lavender Background */
+  --card-color: #3A2D65;           /* Slightly lighter for cards */
+  --navbar-bg: rgba(45, 37, 76, 0.95);  /* Soft glass effect navbar */
+  --text-color: #F4F4F4;
+  --primary-color: #7A6CF4;
+  --primary-hover: #A094F7;
+  --border-color: #4E4A67;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.navbar {
+  background: var(--navbar-bg);
+  color: var(--text-color);
+  padding: 1.25rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.card {
+  background: var(--card-color);
+  color: var(--text-color);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+button {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 8px rgba(122, 108, 244, 0.08);
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+input, textarea {
+  background: rgba(255,255,255,0.95);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: inherit;
+  margin-bottom: 1rem;
+  transition: border 0.2s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+::-webkit-input-placeholder { color: #888; }
+::-moz-placeholder { color: #888; }
+:-ms-input-placeholder { color: #888; }
+::placeholder { color: #888; }
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+  .card {
+    padding: 1rem;
+  }
+} 
