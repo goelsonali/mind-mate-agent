@@ -68,13 +68,13 @@ jobs:
       run: |
         if [[ "${{ github.event.inputs.deploy_frontend || 'true' }}" == "true" && "${{ github.event.inputs.deploy_backend || 'true' }}" == "true" ]]; then
           echo "Deploying both frontend and backend"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=${{ env.REGION }}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=${{ env.REGION }},_PROJECT_ID=${{ env.PROJECT_ID }}
         elif [[ "${{ github.event.inputs.deploy_frontend || 'true' }}" == "true" ]]; then
           echo "Deploying frontend only"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_BACKEND=false,_REGION=${{ env.REGION }}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_BACKEND=false,_REGION=${{ env.REGION }},_PROJECT_ID=${{ env.PROJECT_ID }}
         elif [[ "${{ github.event.inputs.deploy_backend || 'true' }}" == "true" ]]; then
           echo "Deploying backend only"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_FRONTEND=false,_REGION=${{ env.REGION }}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_FRONTEND=false,_REGION=${{ env.REGION }},_PROJECT_ID=${{ env.PROJECT_ID }}
         else
           echo "No deployment selected. Skipping."
         fi
