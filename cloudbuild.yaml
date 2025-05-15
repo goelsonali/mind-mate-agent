@@ -31,7 +31,7 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      docker build -t europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/frontend:latest -f ./app/frontend/Dockerfile ./app/frontend
+      docker build -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest -f ./app/frontend/Dockerfile ./app/frontend
   
   # Push the frontend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -45,7 +45,7 @@ steps:
         echo "Skipping frontend push as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      docker push europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/frontend:latest
+      docker push europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest
   
   # Deploy frontend container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -60,7 +60,7 @@ steps:
         exit 0
       fi
       gcloud run deploy mindmate-frontend \
-        --image europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/frontend:latest \
+        --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
         --region $_REGION \
         --platform managed \
         --allow-unauthenticated
@@ -78,7 +78,7 @@ steps:
         echo "Skipping backend build as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
         exit 0
       fi
-      docker build -t europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/backend:latest -f ./app/backend/Dockerfile ./app/backend
+      docker build -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest -f ./app/backend/Dockerfile ./app/backend
   
   # Push the backend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -92,7 +92,7 @@ steps:
         echo "Skipping backend push as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
         exit 0
       fi
-      docker push europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/backend:latest
+      docker push europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest
   
   # Deploy backend container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -107,12 +107,12 @@ steps:
         exit 0
       fi
       gcloud run deploy mindmate-backend \
-        --image europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/backend:latest \
+        --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest \
         --region $_REGION \
         --platform managed \
         --memory 1Gi \
         --allow-unauthenticated
 
 images:
-  - 'europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/frontend:latest'
-  - 'europe-west2-docker.pkg.dev/$_PROJECT_ID/mindmate/backend:latest'
+  - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest'
+  - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest'
