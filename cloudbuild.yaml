@@ -6,7 +6,6 @@ substitutions:
   _DEPLOY_FRONTEND: 'true'
   _DEPLOY_BACKEND: 'true'
   _REGION: 'europe-west2'
-  _PROJECT_ID: 'static-concept-459810-q7'
 
 # Enable explicit logging
 options:
@@ -16,7 +15,7 @@ steps:
   # Log build start for debugging
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
-    args: ['-c', 'echo "Starting Mind Mate build process for $PROJECT_ID"']
+    args: ['-c', 'echo "Starting Mind Mate build process for static-concept-459810-q7"']
   
   # Frontend deployment
   # Build the frontend container image
