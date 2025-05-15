@@ -1,12 +1,12 @@
-FROM node:20-alpine as build
+FROM node:20 as build
 
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package.docker.json ./package.json
 
-# Install dependencies with specific platform to avoid OS-specific issues
-RUN npm install --platform=linux --no-optional
+# Install dependencies with improved compatibility
+RUN npm install
 
 # Copy source code
 COPY . .
