@@ -40,7 +40,7 @@ const SAMPLE_HISTORY = [
   { date: 'Sun', value: 4 }
 ]
 
-const MoodTracker = () => {
+const MoodTracker = ({ setMood }) => {
   const [selectedMood, setSelectedMood] = useState(null)
   const [moodHistory, setMoodHistory] = useState(SAMPLE_HISTORY)
   const [error, setError] = useState(null)
@@ -63,8 +63,8 @@ const MoodTracker = () => {
 
   const handleMoodSelect = async (mood) => {
     setSelectedMood(mood)
-    // In offline mode, just update UI
-  }
+    setMood(mood.label)
+   }
 
   const chartData = {
     labels: moodHistory.map(entry => entry.date),

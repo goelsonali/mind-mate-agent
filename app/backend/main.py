@@ -1,4 +1,3 @@
-import logging
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -32,11 +31,10 @@ async def chat(request: ChatRequest):
     
        # Example response logic
     response_message = await chat_with_user(request.user_id, request.message)
-    logging.info(f"AI Response: {response_message}")
     return {"reply": response_message}
 
 @app.get("/daily-activity/{user_id}")
-async def get_activity(user_id: str, mood: str = "neutral"):
+async def get_activity(user_id: str, mood):
     activity_list = get_daily_activity(user_id, mood)
     return {"user_id": user_id, "activities": activity_list}
 

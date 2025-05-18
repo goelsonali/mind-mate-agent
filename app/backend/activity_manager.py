@@ -27,8 +27,9 @@ def get_daily_activity(user_id, mood):
 
     if user_id not in activity_log or today not in activity_log[user_id]:
         activity = extract_json(ai_response)
-        activity_log.setdefault(user_id, {})[today] = {"activity": activity, "rating": None}
-    return activity_log[user_id][today]["activity"]
+        #activity_log.setdefault(user_id, {})[today] = {"activity": activity, "rating": None}
+    #return activity_log[user_id][today]["activity"]
+    return activity
 
 def rate_activity(user_id, rating):
     today = str(date.today())
