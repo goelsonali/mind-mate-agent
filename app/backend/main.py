@@ -1,19 +1,39 @@
-from fastapi import FastAPI, Request
+import logging
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 from app.backend.agent_logic import process_user_message
 from app.backend.activity_manager import get_daily_activity, rate_activity
 from app.backend.models import MoodEntry
 from app.backend.mood_manager import add_mood, get_mood_history, get_today_mood
 from app.backend.mood_image_generator import generate_mood_collage
+from fastapi.middleware.cors import CORSMiddleware
+from app.backend.chat_manager import chat_with_user
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific origins for better security
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+# Define the request body schema
+class ChatRequest(BaseModel):
+    user_id: str
+    message: str
+
 @app.post("/chat")
-async def chat(request: Request):
-    data = await request.json()
-    user_id = data.get("user_id")
-    message = data.get("message")
-    return process_user_message(user_id, message)
+async def chat(request: ChatRequest):
+    if not request.message.strip():
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    
+       # Example response logic
+    response_message = await chat_with_user(request.user_id, request.message)
+    logging.info(f"AI Response: {response_message}")
+    return {"reply": response_message}
 
 @app.get("/daily-activity/{user_id}")
 async def get_activity(user_id: str, mood: str = "neutral"):
@@ -53,8 +73,8 @@ async def mood_collage(user_id: str):
         return {"error": "No mood history found for this user."}
 
     # Generate the collage image
-    collage_path = generate_mood_collage(user_id, mood_history)
-    return {"user_id": user_id, "collage_path": collage_path}
+   #  collage_path = generate_mood_collage(user_id, mood_history)
+    return {"user_id": user_id, "collage_path": "collage_path"}
 
 @app.get("/image/{image_name}")
 async def get_image(image_name: str):
