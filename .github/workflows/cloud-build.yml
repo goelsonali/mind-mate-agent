@@ -1,0 +1,84 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering
+    inputs:
+      deploy_frontend:
+        description: 'Deploy frontend?'
+        required: true
+        default: true
+        type: boolean
+      deploy_backend:
+        description: 'Deploy backend?'
+        required: true
+        default: true
+        type: boolean
+      region:
+        description: 'Deployment region'
+        required: true
+        default: 'europe-west2'
+        type: choice
+        options:
+          - 'europe-west2'
+          - 'us-central1'
+          - 'us-east1'
+
+env:
+  PROJECT_ID: static-concept-459810-q7
+  SERVICE_ACCOUNT: github-actions-mindmate@static-concept-459810-q7.iam.gserviceaccount.com
+  REGION: ${{ github.event.inputs.region || 'europe-west2' }}  # Default to London region if not specified
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    # Add permissions needed for the Workload Identity Federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+        install_components: 'gke-gcloud-auth-plugin'
+    
+    - name: Authenticate to Google Cloud
+      uses: 'google-github-actions/auth@v2'
+      with:
+        # Use Workload Identity Federation instead of service account keys
+        workload_identity_provider: projects/431880575932/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: ${{ env.SERVICE_ACCOUNT }}
+        token_format: 'access_token'
+        
+    - name: Display build information
+      run: |
+        echo "Building Mind Mate for deployment to ${{ env.REGION }}"
+        echo "Frontend deployment: ${{ github.event.inputs.deploy_frontend || 'true' }}"
+        echo "Backend deployment: ${{ github.event.inputs.deploy_backend || 'true' }}"
+    
+    - name: Build and Deploy with Cloud Build
+      run: |
+        # Set deployment flags based on inputs
+        DEPLOY_FRONTEND="${{ github.event.inputs.deploy_frontend || 'true' }}"
+        DEPLOY_BACKEND="${{ github.event.inputs.deploy_backend || 'true' }}"
+        REGION="${{ env.REGION }}"
+        if [[ "${DEPLOY_FRONTEND}" == "true" && "${DEPLOY_BACKEND}" == "true" ]]; then
+          echo "Deploying both frontend and backend"
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=${REGION}
+        elif [[ "${DEPLOY_FRONTEND}" == "true" ]]; then
+          echo "Deploying frontend only"
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_BACKEND=false,_REGION=${REGION}
+        elif [[ "${DEPLOY_BACKEND}" == "true" ]]; then
+          echo "Deploying backend only"
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_FRONTEND=false,_REGION=${REGION}
+        else
+          echo "No deployment selected. Skipping."
+        fi

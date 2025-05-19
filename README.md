@@ -1,6 +1,15 @@
-# Mind mate agent
+# Mind Mate Agent
 
-# How to start your agent ?
+Mind Mate is an AI-powered mental health companion designed to help users track their moods and provide personalized activity suggestions based on their emotional state. The application leverages Google's Gemini AI model to create an intelligent, responsive, and scalable mental health support system.
+
+## Project Structure
+
+The project is organized into two main components:
+
+- **Frontend**: React-based UI located in `/app/frontend`
+- **Backend**: FastAPI-based server located in `/app/backend`
+
+## How to Start Your Application
 - Pre-requisite
     1. Set-up python on your machine.
     2. Get your GEMINI key to access the LLM.
@@ -29,7 +38,29 @@
     uvicorn app.backend.main:app --reload
     ```
 
-# How to test your application response
+## Frontend Setup
+
+1. Navigate to the frontend directory
+   ```bash
+   cd app/frontend
+   ```
+
+2. Install dependencies
+   ```bash
+   npm install
+   ```
+
+3. Start the development server
+   ```bash
+   npm run dev
+   ```
+   This will start the React development server, typically on http://localhost:5173
+
+## Deployment
+
+This project is configured to deploy to Google Cloud Platform (GCP) using Cloud Run for both frontend and backend services. For detailed deployment instructions, see the [DEPLOYMENT.md](DEPLOYMENT.md) file.
+
+## How to Test Your Application Response
 - Try out these endpoints
     1. Option1: Using curl command
         - curl http://localhost:8000/daily-activity/u123?mood=low
@@ -52,8 +83,23 @@ pip install diffusers transformers
 API - 
 http GET http://localhost:8000/mood/collage/user123
 
-# Further Enhancements:
-- Cached Collages: Save and reuse collages for the same mood history to reduce computation.
-- Custom Layouts: Let users choose between grid, spiral, or timeline layouts.
-- Advanced Visualization: Use mood statistics to add overlays or captions.
-- Asynchronous Processing: Use background workers (like Celery) to generate the collage without blocking the API.
+## Architecture
+
+Mind Mate follows a multi-agent architecture where specialized AI agents handle different aspects of mental wellness:
+
+1. **Main Coordinator Agent** - Central conversational interface with users
+2. **Mood Analysis Agent** - Processes emotional detection and sentiment analysis
+3. **Activity Recommendation Agent** - Matches current mood to appropriate activities
+4. **Feedback Processing Agent** - Captures and analyzes activity effectiveness
+5. **Progress Tracking Agent** - Analyzes long-term trends and generates insights
+
+For more details on the architecture, see [mindmate-architecture.md](mindmate-architecture.md).
+
+## Further Enhancements
+
+- Cached Collages: Save and reuse collages for the same mood history to reduce computation
+- Custom Layouts: Let users choose between grid, spiral, or timeline layouts
+- Advanced Visualization: Use mood statistics to add overlays or captions
+- Asynchronous Processing: Use background workers (like Celery) to generate the collage without blocking the API
+- Integration with wearable devices for passive mood tracking
+- Personalized activity recommendations based on user feedback history

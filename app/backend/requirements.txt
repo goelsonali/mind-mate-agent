@@ -1,0 +1,13 @@
+# Core dependencies
+fastapi==0.115.12
+uvicorn==0.34.1
+pydantic==2.11.3
+python-dotenv==1.1.0
+
+# AI and Image generation
+google-generativeai==0.8.4
+pillow==11.0.0
+
+# Standard libraries with explicit versions
+numpy==2.1.2
+requests==2.32.3
