@@ -1,8 +1,7 @@
 from datetime import date
-import random
 import json
 import re
-from app.backend.gemini_agent import GeminiAgent
+from gemini_agent import GeminiAgent
 
 
 agent = GeminiAgent()

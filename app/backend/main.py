@@ -1,13 +1,14 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from app.backend.agent_logic import process_user_message
-from app.backend.activity_manager import get_daily_activity, rate_activity
-from app.backend.models import MoodEntry
-from app.backend.mood_manager import add_mood, get_mood_history, get_today_mood
-from app.backend.mood_image_generator import generate_mood_collage
 from fastapi.middleware.cors import CORSMiddleware
-from app.backend.chat_manager import chat_with_user
+from agent_logic import process_user_message
+from activity_manager import get_daily_activity, rate_activity
+from models import MoodEntry
+from mood_manager import add_mood, get_mood_history, get_today_mood
+from mood_image_generator import generate_mood_collage
+from chat_manager import chat_with_user
+
 
 app = FastAPI()
 
