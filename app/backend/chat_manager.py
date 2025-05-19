@@ -1,4 +1,4 @@
-from app.backend.gemini_agent import GeminiAgent
+from gemini_agent import GeminiAgent
 import asyncio
 
 lock = asyncio.Lock()
