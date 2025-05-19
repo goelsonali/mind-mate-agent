@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { fetchChatResponse } from "../api/api"
 
 const SAMPLE_MESSAGES = [
-  { text: "Hi, I'm MindMate! How can I support you today?", sender: 'ai' },
-  { text: "I'm feeling a bit stressed.", sender: 'user' },
-  { text: "Thank you for sharing. Would you like to try a breathing exercise or talk more about it?", sender: 'ai' }
+  { text: "Hi, I'm MindMate! How can I support you today?", sender: 'ai' }
 ]
 
 const ChatBox = () => {
@@ -32,21 +31,12 @@ const ChatBox = () => {
 
     // Try backend, fallback to dummy reply
     try {
-      const response = await fetch('http://localhost:8000/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input })
-      })
-      const data = await response.json()
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: data.response, sender: 'ai' }])
-        setIsTyping(false)
-      }, 1000)
+      const response = await fetchChatResponse('user123', input)
+      setMessages((prev) => [...prev, { text: response.reply, sender: "ai" }]);
     } catch (error) {
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: "(Offline) I'm here for you!", sender: 'ai' }])
-        setIsTyping(false)
-      }, 1000)
+      setMessages((prev) => [...prev, { text: "(Offline) I'm here for you!", sender: "ai" }]);
+    } finally {
+      setIsTyping(false);
     }
   }
 
