@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 const Navbar = () => {
   const location = useLocation()
-  const isActive = (path) => location.pathname === path
+  const isActive = (path) => location.pathname.startsWith(path)
 
   return (
     <motion.nav
