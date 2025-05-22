@@ -293,6 +293,7 @@ textarea:disabled,
   animation: fadeIn var(--transition-normal);
 }
 
+<<<<<<< Updated upstream
 .animate-slide-up {
   animation: slideUp var(--transition-normal);
 }
@@ -347,4 +348,172 @@ textarea:disabled,
 @keyframes blink-caret {
   0%, 100% { border-color: #B8C1EC; }
   50% { border-color: transparent; }
+=======
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+  .card {
+    padding: 1rem;
+  }
+}
+
+/* Login Modal Styles */
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(25, 20, 40, 0.92);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s;
+}
+.login-modal-card {
+  background: var(--card-color, #3A2D65);
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  min-width: 340px;
+  max-width: 95vw;
+  width: 400px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+.login-modal-card::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: 28px;
+  background: linear-gradient(90deg, #7CAEFF, #A6FFC4);
+  animation: gradientGlow 6s ease-in-out infinite alternate;
+}
+@keyframes gradientGlow {
+  0% { filter: blur(0.5px) brightness(1); }
+  100% { filter: blur(2.5px) brightness(1.08); }
+}
+.login-modal-slogan {
+  color: #B8C1EC;
+  font-size: 1.15rem;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.01em;
+}
+.google-signin-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #B8C1EC 0%, #A6FFC4 100%);
+  color: #2D254C;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 0;
+  font-size: 1.08rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 12px #b8c1ec22;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.google-signin-btn:hover {
+  background: linear-gradient(90deg, #A6FFC4 0%, #B8C1EC 100%);
+  box-shadow: 0 4px 20px #a6ffc433;
+}
+.login-divider {
+  color: #B8C1EC;
+  margin: 1rem 0 1.2rem 0;
+  font-size: 1rem;
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+.login-divider::before, .login-divider::after {
+  content: "";
+  display: inline-block;
+  width: 30%;
+  height: 1px;
+  background: linear-gradient(90deg, #7CAEFF, #A6FFC4);
+  vertical-align: middle;
+  margin: 0 0.5em;
+}
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.login-form label {
+  color: #B8C1EC;
+  font-size: 0.98rem;
+  margin-bottom: 0.2rem;
+}
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #4E4A67);
+  background: rgba(255,255,255,0.97);
+  color: #2D254C;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+.login-form input[type="checkbox"] {
+  accent-color: #A6FFC4;
+  margin-right: 0.5em;
+}
+.login-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.remember-me {
+  color: #B8C1EC;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+.signup-link {
+  color: #A6FFC4;
+  text-decoration: none;
+  font-size: 0.97rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.signup-link:hover {
+  color: #7CAEFF;
+  text-decoration: underline;
+}
+.login-btn {
+  width: 100%;
+  background: var(--primary-color, #7A6CF4);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 0;
+  font-size: 1.08rem;
+  font-weight: 600;
+  margin-top: 0.7rem;
+  box-shadow: 0 2px 8px #7a6cf422;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.login-btn:hover {
+  background: var(--primary-hover, #A094F7);
+  box-shadow: 0 4px 20px #a094f733;
+}
+@media (max-width: 600px) {
+  .login-modal-card {
+    min-width: 0;
+    width: 98vw;
+    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+  }
+>>>>>>> Stashed changes
 } 

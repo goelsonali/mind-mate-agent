@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import LoginModal from './LoginModal'
 
 const Navbar = () => {
-  const location = useLocation()
-  const isActive = (path) => location.pathname.startsWith(path)
+  const [loginOpen, setLoginOpen] = useState(false)
 
   return (
     <motion.nav
@@ -11,128 +11,53 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
       className="navbar"
+      style={{
+        background: 'var(--navbar-bg)',
+        color: 'var(--text-color)',
+        backdropFilter: 'blur(10px)',
+        padding: '1.25rem 0',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+      }}
     >
-      <div className="container" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: '0 var(--spacing-xl)'
-      }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-accent"
-            style={{ 
-              fontSize: '1.75rem', 
-              fontWeight: 700, 
-              letterSpacing: '0.5px',
-              fontFamily: 'var(--font-family-primary)'
-            }}
-          >
-            MindMate
-          </motion.h1>
-        </Link>
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          style={{ 
-            display: 'flex', 
-            gap: 'var(--spacing-xl)',
-            alignItems: 'center'
-          }}
+      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 960, margin: '0 auto', padding: '0 2rem' }}>
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ color: 'var(--primary-color)', fontSize: '1.7rem', fontWeight: 700, letterSpacing: 1 }}
         >
-          <Link 
-            to="/how-it-works" 
-            className="nav-link"
-            style={{ 
-              color: isActive('/how-it-works') ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
+          MindMate
+        </motion.h1>
+        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+          <a href="#about" style={{ color: 'var(--text-color)', textDecoration: 'none', fontWeight: 500, fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}>About</a>
+          <a href="#how-it-works" style={{ color: 'var(--text-color)', textDecoration: 'none', fontWeight: 500, fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}>How it works</a>
+          <a
+            href="#login"
+            style={{
+              color: '#A6FFC4',
               textDecoration: 'none',
-              fontWeight: 500,
+              fontWeight: 600,
               fontSize: '1.1rem',
-              transition: 'color var(--transition-fast)',
-              position: 'relative',
-              padding: '0.5rem 0'
+              borderRadius: '8px',
+              padding: '0.4rem 1.1rem',
+              background: 'linear-gradient(90deg, #7CAEFF22, #A6FFC422)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+              transition: 'background 0.2s',
+              cursor: 'pointer',
+              marginLeft: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              lineHeight: 1.1,
             }}
+            onClick={e => { e.preventDefault(); setLoginOpen(true); }}
           >
-            How It Works
-            {isActive('/how-it-works') && (
-              <motion.div
-                layoutId="navbar-indicator"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'var(--color-accent)',
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-          </Link>
-          <Link 
-            to="/about" 
-            className="nav-link"
-            style={{ 
-              color: isActive('/about') ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              fontWeight: 500,
-              fontSize: '1.1rem',
-              transition: 'color var(--transition-fast)',
-              position: 'relative',
-              padding: '0.5rem 0'
-            }}
-          >
-            About
-            {isActive('/about') && (
-              <motion.div
-                layoutId="navbar-indicator"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'var(--color-accent)',
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-          </Link>
-          <Link 
-            to="/"
-            className="nav-link"
-            style={{ 
-              color: isActive('/') ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              fontWeight: 500,
-              fontSize: '1.1rem',
-              transition: 'color var(--transition-fast)',
-              position: 'relative',
-              padding: '0.5rem 0'
-            }}
-          >
-            Chat
-            {isActive('/') && (
-              <motion.div
-                layoutId="navbar-indicator"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'var(--color-accent)',
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-          </Link>
-        </motion.div>
+            Login
+          </a>
+        </div>
       </div>
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </motion.nav>
   )
 }
