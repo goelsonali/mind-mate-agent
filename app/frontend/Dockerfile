@@ -11,6 +11,10 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Accept build arg and set ENV for Vite
+ARG VITE_GEMINI_API_KEY
+ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
+
 # Fix permissions for all executables in node_modules
 RUN find /app/node_modules -type f -name "*" -exec chmod +x {} \;
 RUN find /app/node_modules -type d -exec chmod 755 {} \;
