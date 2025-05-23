@@ -4,59 +4,24 @@ Mind-Mate is an AI-powered application designed to support mental health through
 ![image](https://github.com/user-attachments/assets/a5ab2dff-4d32-42aa-b593-d845bfe2ed79)
 
 
-## Project Structure
-
-The project is organized into two main components:
-
+## 🧰 Tech Stack
 - **Frontend**: React-based UI located in `/app/frontend`
 - **Backend**: FastAPI-based server located in `/app/backend`
+- **AI Integration**: Gemini, HuggingFace
+- **DataStore**: Firebase
+- **Hosting:** GCP (Google Cloud)
 
-## How to Start Your Application
-- Pre-requisite
-    1. Set-up python on your machine.
-    2. Get your GEMINI key to access the LLM.
-    3. Create **.env file** and add your key with this variable 
-    ```python
-    GEMINI_API_KEY=<YOUR_KEY> 
-    ```
-- Set-up to run agent locally
-    1. Create virtual environment named `.venv`
-        ```python
-        python -m venv .venv
-        ```
-    2. Activate the virtual environment
-        - Windows:
-            .venv\Scripts\activate
-        - macOS/Linux:
-            source .venv/bin/activate
 
-    3. Install all required dependencies
-        ```python
-        pip install -r requirements.txt
-        ```
-- Start the application
-    Run the below command from your terminal
-    ```python
-    uvicorn app.backend.main:app --reload
-    ```
+## 🧱 System Architecture
+- [Mindmate-Architecture](mindmate-architecture.md)
 
-## Frontend Setup
+## 🚀 Getting Started
+**Prerequisites**
+- Python 3.10+
+- Node.js (for frontend)
 
-1. Navigate to the frontend directory
-   ```bash
-   cd app/frontend
-   ```
+[Guide to get started]()
 
-2. Install dependencies
-   ```bash
-   npm install
-   ```
-
-3. Start the development server
-   ```bash
-   npm run dev
-   ```
-   This will start the React development server, typically on http://localhost:5173
 
 ## Deployment
 
