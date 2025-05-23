@@ -111,6 +111,8 @@ This project was developed by a team of six members. Team members and their cont
 
 **Team Members:**
 
-- **Sonali Goel** (Backend Developer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
-- **Arzu Caner** (Team Leader) | [GitHub](https://github.com/arzucaner) | [LinkedIn](https://www.linkedin.com/in/arzucaner/) | [YouTube](@Codearz) |
-We would like to express our gratitude to the entire team for their contributions to our project.
+- **Sonali Goel** (Backend Engineer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
+- **Arzu Caner** (Frontend Developer) | [GitHub](https://github.com/arzucaner) | [LinkedIn](https://www.linkedin.com/in/arzucaner/) | [YouTube](@Codearz) |
+- **Sonika Janagill** (GCP Engineer) | [GitHub](https://github.com/sjanagill) | [LinkedIn](https://www.linkedin.com/in/sonikaj/) | 
+
+</br>We would like to express our gratitude to the entire team for their contributions to our project.
