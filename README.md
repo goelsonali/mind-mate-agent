@@ -112,5 +112,5 @@ This project was developed by a team of six members. Team members and their cont
 **Team Members:**
 
 - **Sonali Goel** (Backend Developer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
-- **Arzu Caner** (Team Leader) I GitHub I LinkedIn | YouTube |
+- **Arzu Caner** (Team Leader) | [GitHub](https://github.com/arzucaner) | [LinkedIn](https://www.linkedin.com/in/arzucaner/) | [YouTube](@Codearz) |
 We would like to express our gratitude to the entire team for their contributions to our project.
