@@ -105,3 +105,12 @@ For more details on the architecture, see [mindmate-architecture.md](mindmate-ar
 - Asynchronous Processing: Use background workers (like Celery) to generate the collage without blocking the API
 - Integration with wearable devices for passive mood tracking
 - Personalized activity recommendations based on user feedback history
+
+## 🌟🤝Project Team
+This project was developed by a team of six members. Team members and their contributions are as follows:
+
+**Team Members:**
+
+- **Sonali Goel** (Backend Developer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
+- **Arzu Caner** (Team Leader) I GitHub I LinkedIn | YouTube |
+We would like to express our gratitude to the entire team for their contributions to our project.
