@@ -1,6 +1,8 @@
-# Mind Mate Agent
+# Mind Mate Agent: Your Mental Wellness Companion
+Mind-Mate is an AI-powered application designed to support mental health through empathetic conversation, daily mood tracking, guided breathing exercises, and personalized activity suggestions. </br> Leveraging advanced language AI models, it provides users with a safe space to reflect, decompress, and find gentle encouragement-anytime, anywhere.
 
-Mind Mate is an AI-powered mental health companion designed to help users track their moods and provide personalized activity suggestions based on their emotional state. The application leverages Google's Gemini AI model to create an intelligent, responsive, and scalable mental health support system.
+![image](https://github.com/user-attachments/assets/a5ab2dff-4d32-42aa-b593-d845bfe2ed79)
+
 
 ## Project Structure
 
