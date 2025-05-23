@@ -46,3 +46,26 @@
    npm run dev
    ```
    This will start the React development server, typically on http://localhost:5173
+
+## How to Test Your Application
+- Try out these endpoints
+    1. Option1: Using curl command
+        - curl http://localhost:8000/daily-activity/u123?mood=low
+
+    2. (Optional) To test the post endpoint using command line in user-friendly way
+        - pip install httpie
+        - http POST http://localhost:8000/chat user_id="user123" message="Hello!"
+        - http GET http://localhost:8000/daily-activity/user123?mood=excited
+
+- For mood tracking feature
+    1. To add the mood data 
+        - http POST http://localhost:8000/mood user_id="user123" mood="happy" tracking_date="2025-05-12"
+    2. To get the mood data for a user
+        - http GET http://localhost:8000/mood/user123
+
+Additional python libraries to install for image generation feature
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install diffusers transformers
+
+API - 
+http GET http://localhost:8000/mood/collage/user123
