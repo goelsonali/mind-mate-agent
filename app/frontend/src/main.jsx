@@ -1,37 +1,30 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 import App from './App'
 import './styles/global.css'
 
-// Add typing animation styles
-const style = document.createElement('style')
-style.textContent = `
-  .typing-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--primary);
-    border-radius: 50%;
-    animation: typing 1s infinite ease-in-out;
-  }
-  .typing-dot:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  .typing-dot:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-  @keyframes typing {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-`
-document.head.appendChild(style)
+console.log('main.jsx starting...');
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+try {
+  const rootElement = document.getElementById('root');
+  console.log('Root element found:', rootElement);
+
+  if (!rootElement) {
+    throw new Error('Root element not found!');
+  }
+
+  const root = createRoot(rootElement);
+  console.log('Root created');
+
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+  console.log('Render called');
+} catch (error) {
+  console.error('Error in main.jsx:', error);
+  document.body.innerHTML = `<div style="color: red; padding: 20px;">
+    Error: ${error.message}
+  </div>`;
+}

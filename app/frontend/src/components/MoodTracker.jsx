@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Line } from 'react-chartjs-2'
+import { useAuth } from '../context/AuthContext'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,27 +45,71 @@ const MoodTracker = ({ setMood }) => {
   const [selectedMood, setSelectedMood] = useState(null)
   const [moodHistory, setMoodHistory] = useState(SAMPLE_HISTORY)
   const [error, setError] = useState(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const { token } = useAuth()
 
   useEffect(() => {
-    fetch('http://localhost:8000/mood')
+    if (!token) return;
+
+    fetch('http://localhost:8000/api/user/profile', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setMoodHistory(data)
-        } else {
-          setMoodHistory(SAMPLE_HISTORY)
+        if (data.mood_history && data.mood_history.length > 0) {
+          const history = data.mood_history.map(entry => ({
+            date: new Date(entry.timestamp).toLocaleDateString('en-US', { weekday: 'short' }),
+            value: moods.findIndex(m => m.label.toLowerCase() === entry.mood.toLowerCase()) + 1
+          }));
+          setMoodHistory(history);
         }
       })
-      .catch(() => {
-        setMoodHistory(SAMPLE_HISTORY)
-        setError('Offline mode: showing sample data.')
-      })
-  }, [])
+      .catch((err) => {
+        console.error('Error fetching mood history:', err);
+        setError('Failed to load mood history.');
+      });
+  }, [token])
 
-  const handleMoodSelect = async (mood) => {
+  const handleMoodSelect = (mood) => {
     setSelectedMood(mood)
     setMood(mood.label)
-   }
+  }
+
+  const handleSaveMood = async () => {
+    if (!selectedMood || !token) return;
+    
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/user/mood', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ mood: selectedMood.label })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save mood');
+      }
+
+      // Add new mood to history
+      const newEntry = {
+        date: new Date().toLocaleDateString('en-US', { weekday: 'short' }),
+        value: moods.findIndex(m => m === selectedMood) + 1
+      };
+      setMoodHistory([...moodHistory.slice(-6), newEntry]);
+    } catch (err) {
+      console.error('Error saving mood:', err);
+      setError('Failed to save mood. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   const chartData = {
     labels: moodHistory.map(entry => entry.date),
@@ -111,7 +156,8 @@ const MoodTracker = ({ setMood }) => {
     <div className="card">
       <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary)' }}>How are you feeling today?</h2>
       {error && <p style={{ color: 'var(--accent)', marginBottom: '1rem' }}>{error}</p>}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
         {moods.map((mood) => (
           <motion.button
             key={mood.label}
@@ -134,6 +180,30 @@ const MoodTracker = ({ setMood }) => {
             {mood.emoji}
           </motion.button>
         ))}
+        </div>
+        {selectedMood && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={handleSaveMood}
+            disabled={isSaving}
+            style={{
+              background: 'var(--primary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.75rem 2rem',
+              fontSize: '1rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              opacity: isSaving ? 0.7 : 1
+            }}
+          >
+            {isSaving ? 'Saving...' : 'Save Mood'}
+          </motion.button>
+        )}
       </div>
       {moodHistory.length > 0 && (
         <div style={{ height: '300px' }}>
