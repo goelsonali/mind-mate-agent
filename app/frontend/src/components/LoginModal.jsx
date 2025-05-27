@@ -1,9 +1,32 @@
 import { useState } from 'react'
+import { useGoogleLogin } from '@react-oauth/google'
 
 const LoginModal = ({ open, onClose }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        // Send the access token to your backend
+        const result = await fetch('http://localhost:8000/api/auth/google', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token: response.access_token }),
+        })
+        const data = await result.json()
+        // Handle successful login
+        console.log('Login successful:', data)
+        onClose()
+      } catch (error) {
+        console.error('Login failed:', error)
+      }
+    },
+    onError: () => console.error('Google Login Failed'),
+  })
 
   if (!open) return null
 
@@ -13,7 +36,7 @@ const LoginModal = ({ open, onClose }) => {
         <div className="login-modal-slogan">
           A peaceful mind begins with one simple check-in.
         </div>
-        <button className="google-signin-btn">
+        <button className="google-signin-btn" onClick={() => googleLogin()}>
           <span style={{fontSize: '1.3em', marginRight: 8}}>🔒</span>
           Sign in with Google
         </button>

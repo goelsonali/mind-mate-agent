@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import LoginModal from './LoginModal'
 
 const Navbar = () => {
   const location = useLocation()
   const isActive = (path) => location.pathname.startsWith(path)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
 
   return (
     <motion.nav
@@ -131,10 +134,30 @@ const Navbar = () => {
               />
             )}
           </Link>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setLoginModalOpen(true)}
+            style={{
+              background: 'var(--color-accent)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.5rem 1.25rem',
+              fontWeight: 600,
+              fontSize: '1rem',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              transition: 'all var(--transition-fast)'
+            }}
+          >
+            Login
+          </motion.button>
         </motion.div>
       </div>
+      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </motion.nav>
   )
 }
 
-export default Navbar 
+export default Navbar
