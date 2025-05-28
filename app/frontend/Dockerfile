@@ -1,12 +1,20 @@
-FROM node:18 as build
+# Use a specific Node.js version for better compatibility
+FROM node:16-bullseye-slim as build
 
 WORKDIR /app
 
-# Copy package files first
-COPY package.json package-lock.json ./
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies with platform=linux to avoid Windows-specific dependencies
-RUN npm ci --no-optional --platform=linux --omit=dev
+# Copy only the package files first (for better caching)
+COPY package.json ./
+
+# Install only production dependencies
+RUN npm install --production=false --unsafe-perm
 
 # Copy the rest of the application code
 COPY . .
