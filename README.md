@@ -45,13 +45,14 @@ This project is configured to deploy to Google Cloud Platform (GCP) using Cloud 
 - **Gamification and Achievements:** Motivate users with mood-boosting challenges, streaks, and badges for positive journaling, completing recommended activities, or showing progress in self-care routines.
 - **Performance:** Improving application processing by tailoring asynchronous background processing for heavy tasks.
 - **Voice Input:** Let users log moods and journal notes via voice commands, making mood tracking more accessible and engaging.
+- **Dynamic Visualisation:** Enhance accessibility by offering customisable visual elements and multiple display options to suit different user preferences and needs.
 
 ## 🌟🤝Project Team
 This project was developed by a team of six members. Team members and their contributions are as follows:
 
 **Team Members:**
 
-- **Sonali Goel** (Backend Engineer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
+- **Sonali Goel** (Team Lead | Backend Engineer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
 - **Arzu Caner** (Frontend Developer) | [GitHub](https://github.com/arzucaner) | [LinkedIn](https://www.linkedin.com/in/arzucaner/) | [YouTube](@Codearz) |
 - **Sonika Janagill** (Backend and GCP Engineer) | [GitHub](https://github.com/sjanagill) | [LinkedIn](https://www.linkedin.com/in/sonikaj/) | 
 
