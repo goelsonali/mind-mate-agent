@@ -1,5 +1,5 @@
-# Use a specific Node.js version for better compatibility
-FROM node:16-bullseye-slim as build
+# Use a specific Node.js version known to work with Vite
+FROM node:18-buster as build
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy only the package files first (for better caching)
 COPY package.json ./
 
-# Install only production dependencies
+# Install dependencies
 RUN npm install --production=false --unsafe-perm
 
 # Copy the rest of the application code
@@ -24,6 +24,9 @@ ARG VITE_GEMINI_API_KEY
 ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
+
+# Fix for crypto.getRandomValues issue
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Build the application
 ENV NODE_ENV=production
