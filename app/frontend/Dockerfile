@@ -5,8 +5,8 @@ WORKDIR /app
 # Copy package files first
 COPY package.json package-lock.json ./
 
-# Install ALL dependencies (including dev dependencies)
-RUN npm install
+# Install dependencies with platform=linux to avoid Windows-specific dependencies
+RUN npm ci --no-optional --platform=linux --omit=dev
 
 # Copy the rest of the application code
 COPY . .
