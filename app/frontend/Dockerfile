@@ -1,23 +1,30 @@
-FROM node:20 as build
+# Use Node.js LTS version for better stability
+FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Copy package files first for better caching
+# Install dependencies for node-gyp (if needed)
+RUN apk add --no-cache python3 make g++
+
+# First copy only package files to leverage Docker cache
 COPY package.json package-lock.json ./
 
-# Install dependencies with CI mode for more reliable builds
-RUN npm ci
+# Clean install dependencies with legacy peer deps flag to avoid compatibility issues
+RUN npm ci --legacy-peer-deps
 
-# Copy source code
+# Copy the rest of the application code
 COPY . .
 
-# Accept build arg and set ENV for Vite
+# Set environment variables
 ARG VITE_GEMINI_API_KEY
 ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
 
-# Build the app with explicit NODE_ENV
+# Explicitly install react-router-dom to ensure it's available
+RUN npm install react-router-dom@6.30.1 @react-oauth/google@0.12.1 --save
+
+# Build the application with production mode
 ENV NODE_ENV=production
 RUN npm run build
 
