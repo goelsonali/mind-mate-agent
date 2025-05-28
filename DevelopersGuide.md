@@ -7,26 +7,30 @@
     ```python
     GEMINI_API_KEY=<YOUR_KEY> 
     ```
-## Backend Setup    
-- **Set-up to run agent locally**
-    1. Create virtual environment named `.venv`
-        ```python
-        python -m venv .venv
-        ```
-    2. Activate the virtual environment
-        - Windows:
-            .venv\Scripts\activate
-        - macOS/Linux:
-            source .venv/bin/activate
+## Backend Setup 
 
-    3. Install all required dependencies
-        ```python
-        pip install -r requirements.txt
-        ```
-- **Start the application**
-    Run the below command from your terminal
+1. Navigate to the backend directory
+    ```bash
+    cd app/backend
+    ```
+2. Create virtual environment named `.venv`
     ```python
-    uvicorn app.backend.main:app --reload
+    python -m venv .venv
+    ```
+3. Activate the virtual environment
+    - Windows:
+        .venv\Scripts\activate
+    - macOS/Linux:
+        source .venv/bin/activate
+
+4. Install all required dependencies
+    ```python
+    pip install -r requirements.txt
+    ```
+5. Start the application
+    Run the below command from your terminal ( app/backend)
+    ```python
+    uvicorn main:app --reload
     ```
 
 ## Frontend Setup
