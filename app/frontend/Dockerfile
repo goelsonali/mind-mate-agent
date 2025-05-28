@@ -1,16 +1,19 @@
 # Use Node.js LTS version for better stability
-FROM node:18-alpine as build
+FROM node:18 as build
 
 WORKDIR /app
-
-# Install dependencies for node-gyp (if needed)
-RUN apk add --no-cache python3 make g++
 
 # First copy only package files to leverage Docker cache
 COPY package.json package-lock.json ./
 
-# Clean install dependencies with legacy peer deps flag to avoid compatibility issues
+# Install dependencies with legacy peer deps flag to avoid compatibility issues
 RUN npm ci --legacy-peer-deps
+
+# Explicitly install react-router-dom and other problematic dependencies
+RUN npm install react-router-dom@6.30.1 @react-oauth/google@0.12.1 --save
+
+# Copy the build script first (for better caching)
+COPY build.js ./
 
 # Copy the rest of the application code
 COPY . .
@@ -21,12 +24,9 @@ ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
 
-# Explicitly install react-router-dom to ensure it's available
-RUN npm install react-router-dom@6.30.1 @react-oauth/google@0.12.1 --save
-
-# Build the application with production mode
+# Build the application with production mode using our custom build script
 ENV NODE_ENV=production
-RUN npm run build
+RUN node build.js
 
 # Production stage with Nginx
 FROM nginx:alpine
