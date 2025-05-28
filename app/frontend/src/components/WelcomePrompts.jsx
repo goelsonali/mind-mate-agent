@@ -30,6 +30,8 @@ const WelcomePrompts = ({ onComplete }) => {
   const [error, setError] = useState(null)
   const [stars] = useState(generateStars())
   const [typedText, setTypedText] = useState('')
+  const [responses, setResponses] = useState({})
+  const [savingResponses, setSavingResponses] = useState(false)
   const { user, isAuthenticated } = useAuth()
 
   // Add a separate effect to log authentication status for debugging
@@ -127,13 +129,68 @@ const WelcomePrompts = ({ onComplete }) => {
     }
   }, [currentPrompt, prompts])
 
+  // Function to save responses to the backend
+  const saveResponsesToBackend = async () => {
+    if (!isAuthenticated || !user?.user_id) {
+      console.warn('User not authenticated, responses will not be saved')
+      onComplete && onComplete()
+      return
+    }
+    
+    try {
+      setSavingResponses(true)
+      
+      // Prepare the data to send to the backend
+      const responseData = {
+        user_id: user.user_id,
+        responses: responses,
+        timestamp: new Date().toISOString()
+      }
+      
+      console.log('Saving user responses:', responseData)
+      
+      // Send the data to the backend
+      const response = await fetch(`${API_URL}/user/onboarding`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify(responseData)
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to save responses')
+      }
+      
+      console.log('Responses saved successfully')
+      onComplete && onComplete()
+    } catch (error) {
+      console.error('Error saving responses:', error)
+      // Still call onComplete even if saving fails
+      onComplete && onComplete()
+    } finally {
+      setSavingResponses(false)
+    }
+  }
+  
   const handleSubmit = (e) => {
     e.preventDefault()
+    
+    // Save the current answer to responses object
+    if (prompts[currentPrompt]) {
+      setResponses(prev => ({
+        ...prev,
+        [prompts[currentPrompt]]: answer
+      }))
+    }
+    
     if (currentPrompt < prompts.length - 1) {
       setCurrentPrompt(prev => prev + 1)
       setAnswer('')
     } else {
-      onComplete && onComplete()
+      // We've reached the last prompt, save responses and complete
+      saveResponsesToBackend()
     }
   }
 

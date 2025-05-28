@@ -84,6 +84,8 @@ flowchart TD
     PTA <--> PS
     PS <--> CW
 ```
+![image](https://github.com/user-attachments/assets/8d7b270d-766f-465e-8957-b3dc872b4529)
+
 
 ## Core Components
 
