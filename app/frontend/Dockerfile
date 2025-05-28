@@ -2,11 +2,11 @@ FROM node:20 as build
 
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.docker.json ./package.json
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
 
-# Install dependencies with improved compatibility
-RUN npm install
+# Install dependencies with CI mode for more reliable builds
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -14,14 +14,11 @@ COPY . .
 # Accept build arg and set ENV for Vite
 ARG VITE_GEMINI_API_KEY
 ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
 
-# Fix permissions for all executables in node_modules
-RUN find /app/node_modules -type f -name "*" -exec chmod +x {} \;
-RUN find /app/node_modules -type d -exec chmod 755 {} \;
-RUN chmod -R 755 /app/node_modules/.bin
-RUN chmod -R 755 /app/node_modules/@esbuild
-
-# Build the app
+# Build the app with explicit NODE_ENV
+ENV NODE_ENV=production
 RUN npm run build
 
 # Production stage with Nginx
