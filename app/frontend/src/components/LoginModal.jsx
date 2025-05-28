@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 const LoginModal = ({ open, onClose }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
+  const { handleGoogleLogin } = useAuth()
 
   if (!open) return null
 
@@ -47,20 +49,28 @@ const LoginModal = ({ open, onClose }) => {
         }}>
           A peaceful mind begins with one simple check-in.
         </div>
-        <button className="google-signin-btn" aria-label="Sign in with Google" style={{
-          width: '100%',
-          background: 'linear-gradient(90deg, #B8C1EC 0%, #A6FFC4 100%)',
-          color: '#1e1e3f',
-          fontWeight: 600,
-          border: 'none',
-          borderRadius: '12px',
-          padding: '0.85rem 0',
-          fontSize: '1.08rem',
-          marginBottom: '1.2rem',
-          boxShadow: '0 2px 12px #b8c1ec22',
-          cursor: 'pointer',
-          transition: 'background 0.2s, box-shadow 0.2s',
-        }}>
+        <button 
+          className="google-signin-btn" 
+          aria-label="Sign in with Google" 
+          onClick={(e) => {
+            e.preventDefault();
+            handleGoogleLogin();
+          }}
+          style={{
+            width: '100%',
+            background: 'linear-gradient(90deg, #B8C1EC 0%, #A6FFC4 100%)',
+            color: '#1e1e3f',
+            fontWeight: 600,
+            border: 'none',
+            borderRadius: '12px',
+            padding: '0.85rem 0',
+            fontSize: '1.08rem',
+            marginBottom: '1.2rem',
+            boxShadow: '0 2px 12px #b8c1ec22',
+            cursor: 'pointer',
+            transition: 'background 0.2s, box-shadow 0.2s',
+          }}
+        >
           <span style={{fontSize: '1.3em', marginRight: 8}}>🔒</span>
           Sign in with Google
         </button>

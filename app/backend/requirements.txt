@@ -11,3 +11,11 @@ pillow==11.0.0
 # Standard libraries with explicit versions
 numpy==2.1.2
 requests==2.32.3
+
+# Google lohin libs
+fastapi-oauth2
+google-auth
+google-auth-oauthlib
+google-cloud-firestore
+pyjwt
+firebase-admin==6.8.0

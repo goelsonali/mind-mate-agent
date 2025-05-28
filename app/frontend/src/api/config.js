@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8000";
+// Get API URL from environment variables with fallback
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export const API_ENDPOINTS = {
   chat: `${API_BASE_URL}/chat`,
