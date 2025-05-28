@@ -30,7 +30,7 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      docker build -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest -f ./app/frontend/Dockerfile ./app/frontend
+      docker build -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest --build-arg VITE_GEMINI_API_KEY=${_VITE_GEMINI_API_KEY} -f ./app/frontend/Dockerfile ./app/frontend
   
   # Push the frontend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
