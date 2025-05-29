@@ -24,11 +24,24 @@ steps:
     entrypoint: 'bash'
     args: ['-c', 'echo "Starting Mind Mate build process for static-concept-459810-q7"']
   
+  # Verify region is set
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'verify-region'
+    waitFor: ['-']
+    script: |
+      # Ensure region is set
+      if [ -z "$_REGION" ]; then
+        echo "ERROR: Region not specified. Setting to default europe-west2"
+        export _REGION="europe-west2"
+      fi
+      echo "Using region: $_REGION"
+      gcloud config set run/region $_REGION
+
   # Frontend deployment
   # Build the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
-    waitFor: ['-']
+    waitFor: ['verify-region']
     # Skip if _DEPLOY_FRONTEND is false
     env:
       - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
@@ -74,7 +87,6 @@ steps:
       fi
       gcloud run deploy mindmate-frontend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
-        --region="${_REGION}" \
         --platform managed \
         --allow-unauthenticated
 
@@ -134,7 +146,6 @@ steps:
       # Deploy with environment variables
       gcloud run deploy mindmate-backend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest \
-        --region="${_REGION}" \
         --platform managed \
         --memory 1Gi \
         --set-env-vars GOOGLE_CLIENT_ID="${_GOOGLE_CLIENT_ID}",GOOGLE_CLIENT_SECRET="${_GOOGLE_CLIENT_SECRET}",JWT_SECRET="${_JWT_SECRET}",GEMINI_API_KEY="${_GEMINI_API_KEY}",FRONTEND_URL="https://mindmate-frontend-6xntrakg7q-nw.a.run.app",REDIRECT_URI="https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" \
@@ -159,7 +170,6 @@ steps:
       
       # Update the Cloud Run service to use the secrets
       gcloud run services update mindmate-backend \
-        --region="${_REGION}" \
         --add-secret=GOOGLE_APPLICATION_CREDENTIALS_JSON=google-application-credentials:latest \
         --add-secret=FIREBASE_CREDENTIALS_JSON=firebase-credentials:latest
 

@@ -89,6 +89,14 @@ jobs:
         JWT_SECRET="${{ secrets.JWT_SECRET }}"
         GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
         
+        # Ensure region is set
+        if [ -z "$REGION" ]; then
+          REGION="europe-west2"
+          echo "Region not specified, defaulting to $REGION"
+        fi
+        
+        echo "Using region: $REGION"
+        
         # Common substitutions for all deployment scenarios
         COMMON_SUBS="_REGION=${REGION},_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID},_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET},_JWT_SECRET=${JWT_SECRET},_GOOGLE_APPLICATION_CREDENTIALS_JSON_B64=${GOOGLE_CREDS_B64},_FIREBASE_CREDENTIALS_JSON_B64=${FIREBASE_CREDS_B64},_GEMINI_API_KEY=${GEMINI_API_KEY}"
         
