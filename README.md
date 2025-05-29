@@ -41,18 +41,18 @@ This project is configured to deploy to Google Cloud Platform (GCP) using Cloud 
 ## 🔮 Future Enhancements
 
 - **Mood Collages:** Automatically generate visually appealing collages that capture a user’s mood history and positive journal notes, incorporating AI-driven image selection for more meaningful representations.
-- **Advanced Visualization:** Leverage interactive mood statistics to add overlays, captions, and insights that help users identify patterns, triggers, and progress in their emotional well-being.
-- **Privacy-First Data Controls:** Implement robust privacy features, including encrypted mood journals, user-controlled data retention, and easy data export/delete options.
+- **Mood Journals:** Introduce a personalised journaling feature that allows users to record their thoughts and emotions, with options to easily export or delete entries.
 - **Gamification and Achievements:** Motivate users with mood-boosting challenges, streaks, and badges for positive journaling, completing recommended activities, or showing progress in self-care routines.
-- **Dynamic Mood Prediction:** Use machine learning to proactively predict and alert users of potential mood dips based on recent trends, context, and wearable data, offering preemptive interventions.
-- **Voice and Image Input:** Let users log moods and journal notes via voice commands or by uploading images, making mood tracking more accessible and engaging.
+- **Performance:** Improving application processing by tailoring asynchronous background processing for heavy tasks.
+- **Voice Input:** Let users log moods and journal notes via voice commands, making mood tracking more accessible and engaging.
+- **Dynamic Visualisation:** Enhance accessibility by offering customisable visual elements and multiple display options to suit different user preferences and needs.
 
 ## 🌟🤝Project Team
 This project was developed by a team of six members. Team members and their contributions are as follows:
 
 **Team Members:**
 
-- **Sonali Goel** (Backend Engineer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
+- **Sonali Goel** (Team Lead | Backend Engineer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
 - **Arzu Caner** (Frontend Developer) | [GitHub](https://github.com/arzucaner) | [LinkedIn](https://www.linkedin.com/in/arzucaner/) | [YouTube](@Codearz) |
 - **Sonika Janagill** (Backend and GCP Engineer) | [GitHub](https://github.com/sjanagill) | [LinkedIn](https://www.linkedin.com/in/sonikaj/) | 
 
