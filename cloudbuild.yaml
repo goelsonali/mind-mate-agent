@@ -10,8 +10,8 @@ substitutions:
   _GOOGLE_CLIENT_ID: ''
   _GOOGLE_CLIENT_SECRET: ''
   _JWT_SECRET: ''
-  _GOOGLE_APPLICATION_CREDENTIALS_JSON: ''
-  _FIREBASE_CREDENTIALS_JSON: ''
+  _GOOGLE_APPLICATION_CREDENTIALS_JSON_B64: ''
+  _FIREBASE_CREDENTIALS_JSON_B64: ''
   _GEMINI_API_KEY: ''
 
 # Enable explicit logging
@@ -119,12 +119,17 @@ steps:
         echo "Skipping backend deployment as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
         exit 0
       fi
+      
+      # Decode the base64 JSON credentials
+      GOOGLE_CREDS=$(echo "${_GOOGLE_APPLICATION_CREDENTIALS_JSON_B64}" | base64 -d)
+      FIREBASE_CREDS=$(echo "${_FIREBASE_CREDENTIALS_JSON_B64}" | base64 -d)
+      
       gcloud run deploy mindmate-backend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest \
         --region $_REGION \
         --platform managed \
         --memory 1Gi \
-        --set-env-vars "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},JWT_SECRET=${_JWT_SECRET},GOOGLE_APPLICATION_CREDENTIALS_JSON=${_GOOGLE_APPLICATION_CREDENTIALS_JSON},FIREBASE_CREDENTIALS_JSON=${_FIREBASE_CREDENTIALS_JSON},GEMINI_API_KEY=${_GEMINI_API_KEY},FRONTEND_URL=https://mindmate-frontend-6xntrakg7q-nw.a.run.app,REDIRECT_URI=https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" \
+        --set-env-vars "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},JWT_SECRET=${_JWT_SECRET},GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_CREDS},FIREBASE_CREDENTIALS_JSON=${FIREBASE_CREDS},GEMINI_API_KEY=${_GEMINI_API_KEY},FRONTEND_URL=https://mindmate-frontend-6xntrakg7q-nw.a.run.app,REDIRECT_URI=https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" \
         --allow-unauthenticated
 
 images:

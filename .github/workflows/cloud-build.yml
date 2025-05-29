@@ -72,16 +72,25 @@ jobs:
         REGION="${{ env.REGION }}"
         
         # Prepare secrets for Cloud Build substitutions
-        # Escape any special characters in the secrets
-        GOOGLE_CLIENT_ID_ESC=$(echo '${{ secrets.GOOGLE_CLIENT_ID }}' | sed 's/"/\\"/g')
-        GOOGLE_CLIENT_SECRET_ESC=$(echo '${{ secrets.GOOGLE_CLIENT_SECRET }}' | sed 's/"/\\"/g')
-        JWT_SECRET_ESC=$(echo '${{ secrets.JWT_SECRET }}' | sed 's/"/\\"/g')
-        GOOGLE_APPLICATION_CREDENTIALS_JSON_ESC=$(echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}' | sed 's/"/\\"/g')
-        FIREBASE_CREDENTIALS_JSON_ESC=$(echo '${{ secrets.FIREBASE_CREDENTIALS_JSON }}' | sed 's/"/\\"/g')
-        GEMINI_API_KEY_ESC=$(echo '${{ secrets.GEMINI_API_KEY }}' | sed 's/"/\\"/g')
+        # Create temporary files for JSON credentials to avoid command line issues
+        echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}' > google_creds.json
+        echo '${{ secrets.FIREBASE_CREDENTIALS_JSON }}' > firebase_creds.json
+        
+        # Read the files and base64 encode them to safely pass as substitutions
+        GOOGLE_CREDS_B64=$(base64 -w 0 google_creds.json)
+        FIREBASE_CREDS_B64=$(base64 -w 0 firebase_creds.json)
+        
+        # Remove the temporary files
+        rm google_creds.json firebase_creds.json
+        
+        # Prepare other secrets (non-JSON)
+        GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+        GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        JWT_SECRET="${{ secrets.JWT_SECRET }}"
+        GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
         
         # Common substitutions for all deployment scenarios
-        COMMON_SUBS="_REGION=${REGION},_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID_ESC},_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET_ESC},_JWT_SECRET=${JWT_SECRET_ESC},_GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON_ESC},_FIREBASE_CREDENTIALS_JSON=${FIREBASE_CREDENTIALS_JSON_ESC},_GEMINI_API_KEY=${GEMINI_API_KEY_ESC}"
+        COMMON_SUBS="_REGION=${REGION},_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID},_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET},_JWT_SECRET=${JWT_SECRET},_GOOGLE_APPLICATION_CREDENTIALS_JSON_B64=${GOOGLE_CREDS_B64},_FIREBASE_CREDENTIALS_JSON_B64=${FIREBASE_CREDS_B64},_GEMINI_API_KEY=${GEMINI_API_KEY}"
         
         if [[ "${DEPLOY_FRONTEND}" == "true" && "${DEPLOY_BACKEND}" == "true" ]]; then
           echo "Deploying both frontend and backend"
