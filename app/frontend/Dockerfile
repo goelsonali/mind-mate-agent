@@ -1,23 +1,35 @@
+# Use Node.js 20 which matches your local development environment
 FROM node:20 as build
 
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.docker.json ./package.json
+# Copy package files first for better caching
+COPY package*.json ./
 
-# Install dependencies with improved compatibility
-RUN npm install
+# Install dependencies with optimizations
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm ci --prefer-offline --no-audit --progress=false
 
-# Copy source code
+# Copy the rest of the application code
 COPY . .
 
-# Fix permissions for all executables in node_modules
-RUN find /app/node_modules -type f -name "*" -exec chmod +x {} \;
-RUN find /app/node_modules -type d -exec chmod 755 {} \;
-RUN chmod -R 755 /app/node_modules/.bin
-RUN chmod -R 755 /app/node_modules/@esbuild
+# Set environment variables
+# API Configuration
+ARG VITE_GEMINI_API_KEY
+ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
 
-# Build the app
+# Environment
+ARG VITE_APP_ENV
+ENV VITE_APP_ENV=${VITE_APP_ENV:-"production"}
+
+# Feature Flags
+ARG VITE_ENABLE_ANALYTICS
+ENV VITE_ENABLE_ANALYTICS=${VITE_ENABLE_ANALYTICS:-"true"}
+
+# Build the application
+ENV NODE_ENV=production
 RUN npm run build
 
 # Production stage with Nginx

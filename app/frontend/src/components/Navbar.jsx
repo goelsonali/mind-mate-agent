@@ -1,140 +1,57 @@
 import { motion } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import LoginModal from './LoginModal'
 
 const Navbar = () => {
-  const location = useLocation()
-  const isActive = (path) => location.pathname.startsWith(path)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const { user, isAuthenticated, logout } = useAuth()
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className="navbar"
+      className="navbar navbar-custom"
     >
-      <div className="container" style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: '0 var(--spacing-xl)'
-      }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-accent"
-            style={{ 
-              fontSize: '1.75rem', 
-              fontWeight: 700, 
-              letterSpacing: '0.5px',
-              fontFamily: 'var(--font-family-primary)'
-            }}
-          >
-            MindMate
-          </motion.h1>
-        </Link>
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          style={{ 
-            display: 'flex', 
-            gap: 'var(--spacing-xl)',
-            alignItems: 'center'
-          }}
+      <div className="container navbar-container">
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="navbar-title"
         >
-          <Link 
-            to="/how-it-works" 
-            className="nav-link"
-            style={{ 
-              color: isActive('/how-it-works') ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              fontWeight: 500,
-              fontSize: '1.1rem',
-              transition: 'color var(--transition-fast)',
-              position: 'relative',
-              padding: '0.5rem 0'
-            }}
-          >
-            How It Works
-            {isActive('/how-it-works') && (
-              <motion.div
-                layoutId="navbar-indicator"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'var(--color-accent)',
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-          </Link>
-          <Link 
-            to="/about" 
-            className="nav-link"
-            style={{ 
-              color: isActive('/about') ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              fontWeight: 500,
-              fontSize: '1.1rem',
-              transition: 'color var(--transition-fast)',
-              position: 'relative',
-              padding: '0.5rem 0'
-            }}
-          >
-            About
-            {isActive('/about') && (
-              <motion.div
-                layoutId="navbar-indicator"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'var(--color-accent)',
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-          </Link>
-          <Link 
-            to="/"
-            className="nav-link"
-            style={{ 
-              color: isActive('/') ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
-              textDecoration: 'none',
-              fontWeight: 500,
-              fontSize: '1.1rem',
-              transition: 'color var(--transition-fast)',
-              position: 'relative',
-              padding: '0.5rem 0'
-            }}
-          >
-            Chat
-            {isActive('/') && (
-              <motion.div
-                layoutId="navbar-indicator"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '2px',
-                  background: 'var(--color-accent)',
-                  borderRadius: '2px'
-                }}
-              />
-            )}
-          </Link>
-        </motion.div>
+          MindMate
+        </motion.h1>
+        <div className="navbar-links">
+          <a href="#about" className="navbar-link">About</a>
+          <a href="#how-it-works" className="navbar-link">How it works</a>
+          {isAuthenticated ? (
+            <div className="user-menu">
+              <span className="user-greeting" style={{ marginRight: '10px', color: '#B8C1EC' }}>
+                Hello, {user?.name?.split(' ')[0] || 'User'}
+              </span>
+              <a
+                href="#logout"
+                className="navbar-login"
+                onClick={e => { e.preventDefault(); logout(); }}
+              >
+                Logout
+              </a>
+            </div>
+          ) : (
+            <a
+              href="#login"
+              className="navbar-login"
+              onClick={e => { e.preventDefault(); setLoginOpen(true); }}
+            >
+              Login
+            </a>
+          )}
+        </div>
       </div>
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </motion.nav>
   )
 }
 
-export default Navbar 
+export default Navbar

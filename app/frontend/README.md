@@ -9,6 +9,7 @@ A modern, calming mental health companion app built with React and Vite.
 - 🫁 Guided breathing exercises
 - 📝 Activity suggestions
 - 🎨 Calming, accessible design
+- 🔒 Secure Google OAuth login
 
 ## Tech Stack
 
@@ -18,6 +19,7 @@ A modern, calming mental health companion app built with React and Vite.
 - Chart.js (mood tracking)
 - CSS Modules
 - Google Fonts (Inter)
+- @react-oauth/google (Google OAuth)
 
 ## Getting Started
 
@@ -74,6 +76,7 @@ The frontend expects a backend server running at `http://localhost:8000` with th
 - `POST /chat` - Send chat messages
 - `GET /mood` - Get mood history
 - `POST /mood` - Save mood entry
+- `POST /api/auth/google` - Authenticate with Google OAuth
 
 ## Contributing
 

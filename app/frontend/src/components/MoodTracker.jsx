@@ -24,6 +24,9 @@ ChartJS.register(
   Legend
 )
 
+// Get API URL from environment variables with fallback
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const moods = [
   { emoji: '😄', label: 'Happy', value: 5, color: '#B4F8C8' },
   { emoji: '🙂', label: 'Okay', value: 4, color: '#A0E7E5' },
@@ -48,7 +51,7 @@ const MoodTracker = ({ setMood }) => {
   const [isOffline, setIsOffline] = useState(false)
 
   useEffect(() => {
-    fetch('http://localhost:8000/mood')
+    fetch(API_URL + '/mood')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../context/AuthContext'
 
 const PLACEHOLDER_PROMPTS = [
   "What's your name?",
   "How are you feeling today?",
   "What would you like to achieve with MindMate?"
 ]
-
+// Get API URL from environment variables with fallback
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 // Helper for random star positions/colors
 const STAR_COLORS = ['blue', 'lavender', 'mint']
 const STAR_COUNT = 18
@@ -28,29 +30,90 @@ const WelcomePrompts = ({ onComplete }) => {
   const [error, setError] = useState(null)
   const [stars] = useState(generateStars())
   const [typedText, setTypedText] = useState('')
+  const [responses, setResponses] = useState({})
+  const [savingResponses, setSavingResponses] = useState(false)
+  const { user, isAuthenticated } = useAuth()
+
+  // Add a separate effect to log authentication status for debugging
+  useEffect(() => {
+    console.log('Authentication status:', { isAuthenticated, user })
+  }, [isAuthenticated, user])
 
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch('http://localhost:8000')
+    console.log('Setting up prompts with auth status:', isAuthenticated)
+    
+    fetch(API_URL)
       .then(res => {
         if (!res.ok) throw new Error('Network response was not ok')
         return res.json()
       })
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          setPrompts(data)
+          // Process prompts based on authentication status
+          let processedData = [...data];
+          
+          if (isAuthenticated) {
+            console.log('User is authenticated, personalizing prompts')
+            // Filter out name prompt if user is logged in
+            processedData = processedData.filter(prompt => prompt !== "What's your name?");
+            
+            // Personalize the "How are you feeling today?" prompt
+            const feelingIndex = processedData.findIndex(prompt => prompt === "How are you feeling today?");
+            if (feelingIndex !== -1) {
+              processedData[feelingIndex] = `Hello ${user?.name || 'there'}, how are you feeling today?`;
+            }
+          } else {
+            console.log('User is not authenticated, showing all prompts')
+          }
+          
+          setPrompts(processedData);
         } else {
-          setPrompts(PLACEHOLDER_PROMPTS)
+          // Process placeholder prompts based on authentication status
+          let processedPrompts = [...PLACEHOLDER_PROMPTS];
+          
+          if (isAuthenticated) {
+            console.log('User is authenticated, personalizing placeholder prompts')
+            // Filter out name prompt if user is logged in
+            processedPrompts = processedPrompts.filter(prompt => prompt !== "What's your name?");
+            
+            // Personalize the "How are you feeling today?" prompt
+            const feelingIndex = processedPrompts.findIndex(prompt => prompt === "How are you feeling today?");
+            if (feelingIndex !== -1) {
+              processedPrompts[feelingIndex] = `Hello ${user?.name || 'there'}, how are you feeling today?`;
+            }
+          } else {
+            console.log('User is not authenticated, showing all placeholder prompts')
+          }
+          
+          setPrompts(processedPrompts);
         }
         setLoading(false)
       })
       .catch(() => {
-        setPrompts(PLACEHOLDER_PROMPTS)
+        // Process placeholder prompts based on authentication status
+        let processedPrompts = [...PLACEHOLDER_PROMPTS];
+        
+        if (isAuthenticated) {
+          console.log('User is authenticated (offline mode), personalizing prompts')
+          // Filter out name prompt if user is logged in
+          processedPrompts = processedPrompts.filter(prompt => prompt !== "What's your name?");
+          
+          // Personalize the "How are you feeling today?" prompt
+          const feelingIndex = processedPrompts.findIndex(prompt => prompt === "How are you feeling today?");
+          if (feelingIndex !== -1) {
+            processedPrompts[feelingIndex] = `Hello ${user?.name || 'there'}, how are you feeling today?`;
+          }
+        } else {
+          console.log('User is not authenticated (offline mode), showing all prompts')
+        }
+        
+        setPrompts(processedPrompts);
         setError('offline')
         setLoading(false)
       })
-  }, [])
+  }, [isAuthenticated, user])
 
   // Typewriter effect for first prompt
   useEffect(() => {
@@ -66,13 +129,68 @@ const WelcomePrompts = ({ onComplete }) => {
     }
   }, [currentPrompt, prompts])
 
+  // Function to save responses to the backend
+  const saveResponsesToBackend = async () => {
+    if (!isAuthenticated || !user?.user_id) {
+      console.warn('User not authenticated, responses will not be saved')
+      onComplete && onComplete()
+      return
+    }
+    
+    try {
+      setSavingResponses(true)
+      
+      // Prepare the data to send to the backend
+      const responseData = {
+        user_id: user.user_id,
+        responses: responses,
+        timestamp: new Date().toISOString()
+      }
+      
+      console.log('Saving user responses:', responseData)
+      
+      // Send the data to the backend
+      const response = await fetch(`${API_URL}/user/onboarding`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify(responseData)
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to save responses')
+      }
+      
+      console.log('Responses saved successfully')
+      onComplete && onComplete()
+    } catch (error) {
+      console.error('Error saving responses:', error)
+      // Still call onComplete even if saving fails
+      onComplete && onComplete()
+    } finally {
+      setSavingResponses(false)
+    }
+  }
+  
   const handleSubmit = (e) => {
     e.preventDefault()
+    
+    // Save the current answer to responses object
+    if (prompts[currentPrompt]) {
+      setResponses(prev => ({
+        ...prev,
+        [prompts[currentPrompt]]: answer
+      }))
+    }
+    
     if (currentPrompt < prompts.length - 1) {
       setCurrentPrompt(prev => prev + 1)
       setAnswer('')
     } else {
-      onComplete && onComplete()
+      // We've reached the last prompt, save responses and complete
+      saveResponsesToBackend()
     }
   }
 
