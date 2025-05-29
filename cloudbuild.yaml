@@ -12,6 +12,7 @@ substitutions:
   _JWT_SECRET: ''
   _GOOGLE_APPLICATION_CREDENTIALS_JSON: ''
   _FIREBASE_CREDENTIALS_JSON: ''
+  _GEMINI_API_KEY: ''
 
 # Enable explicit logging
 options:
@@ -36,8 +37,15 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      docker build -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest -f ./app/frontend/Dockerfile ./app/frontend
-  
+      docker build \
+        -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
+        --build-arg VITE_API_URL=https://mindmate-backend-6xntrakg7q-nw.a.run.app \
+        --build-arg VITE_APP_ENV=production \
+        --build-arg VITE_ENABLE_ANALYTICS=true \
+        --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
+        -f ./app/frontend/Dockerfile \
+        ./app/frontend
+
   # Push the frontend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-frontend'
@@ -116,7 +124,7 @@ steps:
         --region $_REGION \
         --platform managed \
         --memory 1Gi \
-        --set-env-vars "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},JWT_SECRET=${_JWT_SECRET},GOOGLE_APPLICATION_CREDENTIALS_JSON=${_GOOGLE_APPLICATION_CREDENTIALS_JSON},FIREBASE_CREDENTIALS_JSON=${_FIREBASE_CREDENTIALS_JSON}" \
+        --set-env-vars "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},JWT_SECRET=${_JWT_SECRET},GOOGLE_APPLICATION_CREDENTIALS_JSON=${_GOOGLE_APPLICATION_CREDENTIALS_JSON},FIREBASE_CREDENTIALS_JSON=${_FIREBASE_CREDENTIALS_JSON},GEMINI_API_KEY=${_GEMINI_API_KEY},FRONTEND_URL=https://mindmate-frontend-6xntrakg7q-nw.a.run.app,REDIRECT_URI=https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" \
         --allow-unauthenticated
 
 images:

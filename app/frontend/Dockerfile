@@ -14,10 +14,19 @@ RUN npm config set registry https://registry.npmjs.org/ && \
 COPY . .
 
 # Set environment variables
+# API Configuration
 ARG VITE_GEMINI_API_KEY
 ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
+
+# Environment
+ARG VITE_APP_ENV
+ENV VITE_APP_ENV=${VITE_APP_ENV:-"production"}
+
+# Feature Flags
+ARG VITE_ENABLE_ANALYTICS
+ENV VITE_ENABLE_ANALYTICS=${VITE_ENABLE_ANALYTICS:-"true"}
 
 # Build the application
 ENV NODE_ENV=production
