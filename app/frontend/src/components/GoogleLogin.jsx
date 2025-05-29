@@ -2,11 +2,15 @@ function GoogleLogin() {
   console.log('GoogleLogin component rendering');
 
   const handleGoogleLogin = () => {
-    // Get API URL from environment variables with fallback
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    // Force local development URL when not in production
+    const isDevelopment = import.meta.env.MODE === 'development';
+    const API_URL = isDevelopment 
+      ? 'http://localhost:8080'
+      : (import.meta.env.VITE_API_URL || 'https://mindmate-backend-6xntrakg7q-nw.a.run.app');
+    
     // Redirect to backend auth endpoint
     window.location.href = `${API_URL}/auth/google`;
-    console.log('Redirecting to Google login...');
+    console.log(`Redirecting to Google login at ${API_URL}/auth/google...`);
   };
 
   return (

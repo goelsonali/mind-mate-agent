@@ -70,15 +70,27 @@ jobs:
         DEPLOY_FRONTEND="${{ github.event.inputs.deploy_frontend || 'true' }}"
         DEPLOY_BACKEND="${{ github.event.inputs.deploy_backend || 'true' }}"
         REGION="${{ env.REGION }}"
+        
+        # Prepare secrets for Cloud Build substitutions
+        # Escape any special characters in the secrets
+        GOOGLE_CLIENT_ID_ESC=$(echo '${{ secrets.GOOGLE_CLIENT_ID }}' | sed 's/"/\\"/g')
+        GOOGLE_CLIENT_SECRET_ESC=$(echo '${{ secrets.GOOGLE_CLIENT_SECRET }}' | sed 's/"/\\"/g')
+        JWT_SECRET_ESC=$(echo '${{ secrets.JWT_SECRET }}' | sed 's/"/\\"/g')
+        GOOGLE_APPLICATION_CREDENTIALS_JSON_ESC=$(echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}' | sed 's/"/\\"/g')
+        FIREBASE_CREDENTIALS_JSON_ESC=$(echo '${{ secrets.FIREBASE_CREDENTIALS_JSON }}' | sed 's/"/\\"/g')
+        
+        # Common substitutions for all deployment scenarios
+        COMMON_SUBS="_REGION=${REGION},_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID_ESC},_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET_ESC},_JWT_SECRET=${JWT_SECRET_ESC},_GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON_ESC},_FIREBASE_CREDENTIALS_JSON=${FIREBASE_CREDENTIALS_JSON_ESC}"
+        
         if [[ "${DEPLOY_FRONTEND}" == "true" && "${DEPLOY_BACKEND}" == "true" ]]; then
           echo "Deploying both frontend and backend"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=${REGION}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=${COMMON_SUBS}
         elif [[ "${DEPLOY_FRONTEND}" == "true" ]]; then
           echo "Deploying frontend only"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_BACKEND=false,_REGION=${REGION}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=${COMMON_SUBS},_DEPLOY_BACKEND=false
         elif [[ "${DEPLOY_BACKEND}" == "true" ]]; then
           echo "Deploying backend only"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_FRONTEND=false,_REGION=${REGION}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=${COMMON_SUBS},_DEPLOY_FRONTEND=false
         else
           echo "No deployment selected. Skipping."
         fi

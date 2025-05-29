@@ -6,6 +6,12 @@ substitutions:
   _DEPLOY_FRONTEND: 'true'
   _DEPLOY_BACKEND: 'true'
   _REGION: 'europe-west2'
+  # These will be provided by GitHub Actions from repository secrets
+  _GOOGLE_CLIENT_ID: ''
+  _GOOGLE_CLIENT_SECRET: ''
+  _JWT_SECRET: ''
+  _GOOGLE_APPLICATION_CREDENTIALS_JSON: ''
+  _FIREBASE_CREDENTIALS_JSON: ''
 
 # Enable explicit logging
 options:
@@ -110,6 +116,7 @@ steps:
         --region $_REGION \
         --platform managed \
         --memory 1Gi \
+        --set-env-vars "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},JWT_SECRET=${_JWT_SECRET},GOOGLE_APPLICATION_CREDENTIALS_JSON=${_GOOGLE_APPLICATION_CREDENTIALS_JSON},FIREBASE_CREDENTIALS_JSON=${_FIREBASE_CREDENTIALS_JSON}" \
         --allow-unauthenticated
 
 images:

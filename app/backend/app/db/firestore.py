@@ -17,17 +17,32 @@ def init_firebase():
             except ValueError:
                 print("Invalid credentials file, trying JSON content...")
         
-        # If file path fails, try using JSON content
+        # If file path fails, try using JSON content from either environment variable
+        import json
+        
+        # Try FIREBASE_CREDENTIALS_JSON first
         cred_json = os.getenv('FIREBASE_CREDENTIALS_JSON')
         if cred_json:
-            import json
             try:
                 cred_dict = json.loads(cred_json)
                 cred = credentials.Certificate(cred_dict)
                 firebase_admin.initialize_app(cred)
+                print("Successfully initialized Firebase with FIREBASE_CREDENTIALS_JSON")
                 return firestore.client()
             except (ValueError, json.JSONDecodeError) as e:
-                print(f"Error parsing credentials JSON: {e}")
+                print(f"Error parsing FIREBASE_CREDENTIALS_JSON: {e}")
+        
+        # Then try GOOGLE_APPLICATION_CREDENTIALS_JSON
+        cred_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+        if cred_json:
+            try:
+                cred_dict = json.loads(cred_json)
+                cred = credentials.Certificate(cred_dict)
+                firebase_admin.initialize_app(cred)
+                print("Successfully initialized Firebase with GOOGLE_APPLICATION_CREDENTIALS_JSON")
+                return firestore.client()
+            except (ValueError, json.JSONDecodeError) as e:
+                print(f"Error parsing GOOGLE_APPLICATION_CREDENTIALS_JSON: {e}")
                 raise
         
         raise ValueError("No valid Firebase credentials found in environment variables")

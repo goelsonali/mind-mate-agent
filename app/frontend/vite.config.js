@@ -5,24 +5,16 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Ensure proper dependency resolution
-    commonjsOptions: {
-      include: [/node_modules/],
-      transformMixedEsModules: true
-    },
-    // Improve compatibility with different environments
-    target: 'es2015',
-    // Ensure proper handling of dependencies
+    // Disable SSR which can cause crypto issues
+    ssr: false,
+    // Disable content hash to avoid crypto dependency
+    cssCodeSplit: true,
     rollupOptions: {
-      // Explicitly mark problematic packages as external
-      external: [],
       output: {
-        // Improve code splitting
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            return 'vendor'
-          }
-        }
+        // Disable hash in filenames to avoid crypto dependency
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]'
       }
     }
   },

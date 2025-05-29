@@ -19,7 +19,8 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID").strip('"')
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET").strip('"')
 JWT_SECRET = os.getenv("JWT_SECRET", "your-default-jwt-secret").strip('"')
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8080/auth/google/callback")
+# Use environment variable for redirect URI with a development fallback
+REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:5174/auth/callback")
 
 # Initialize router and load environment variables
 

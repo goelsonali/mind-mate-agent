@@ -1,16 +1,14 @@
-# Use a specific Node.js version known to work with Vite
-FROM node:16 as build
+# Use Node.js 20 which matches your local development environment
+FROM node:20 as build
 
 WORKDIR /app
 
-# Copy only the package files first (for better caching)
-COPY package.json ./
+# Copy package files first for better caching
+COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-
-# Copy custom build script
-COPY custom-build.js ./
+# Install dependencies with optimizations
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm ci --prefer-offline --no-audit --progress=false
 
 # Copy the rest of the application code
 COPY . .
@@ -21,9 +19,9 @@ ENV VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY:-""}
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-"https://mindmate-backend-6xntrakg7q-nw.a.run.app"}
 
-# Build the application using custom build script
+# Build the application
 ENV NODE_ENV=production
-RUN node custom-build.js
+RUN npm run build
 
 # Production stage with Nginx
 FROM nginx:alpine
