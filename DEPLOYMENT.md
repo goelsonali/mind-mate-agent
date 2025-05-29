@@ -203,7 +203,64 @@ gcloud run services update mindmate-frontend \
   --region us-central1
 ```
 
+## Firebase Credentials with Secret Manager
 
+The Mind Mate application uses Google Cloud Secret Manager to securely store and access Firebase credentials. This approach avoids JSON parsing issues and improves security by not embedding credentials in environment variables or container images.
+
+### Setting up Secret Manager for Firebase Credentials
+
+1. **Create the secrets in Secret Manager**
+
+   ```bash
+   # Create a secret for Firebase credentials
+   gcloud secrets create firebase-credentials --replication-policy="automatic"
+   
+   # Create a secret for Google application credentials
+   gcloud secrets create google-application-credentials --replication-policy="automatic"
+   ```
+
+2. **Add your Firebase credentials JSON to the secrets**
+
+   ```bash
+   # Add Firebase credentials from a JSON file
+   gcloud secrets versions add firebase-credentials --data-file="path/to/firebase-credentials.json"
+   
+   # Add Google application credentials from a JSON file
+   gcloud secrets versions add google-application-credentials --data-file="path/to/google-application-credentials.json"
+   ```
+
+3. **Grant access to Cloud Run service account**
+
+   ```bash
+   # Get your Cloud Run service account
+   SERVICE_ACCOUNT="$(gcloud projects describe static-concept-459810-q7 --format='value(projectNumber)')-compute@developer.gserviceaccount.com"
+   
+   # Grant Secret Manager Secret Accessor role for firebase-credentials
+   gcloud secrets add-iam-policy-binding firebase-credentials \
+     --member="serviceAccount:${SERVICE_ACCOUNT}" \
+     --role="roles/secretmanager.secretAccessor"
+   
+   # Grant Secret Manager Secret Accessor role for google-application-credentials
+   gcloud secrets add-iam-policy-binding google-application-credentials \
+     --member="serviceAccount:${SERVICE_ACCOUNT}" \
+     --role="roles/secretmanager.secretAccessor"
+   ```
+
+4. **Deploy with Secret Manager integration**
+
+   When deploying to Cloud Run, use the `--update-secrets` flag to mount the secrets as environment variables:
+
+   ```bash
+   gcloud run deploy mindmate-backend \
+     --image ${BACKEND_IMAGE} \
+     --platform managed \
+     --region ${REGION} \
+     --env-vars-file ${ENV_FILE} \
+     --update-secrets=FIREBASE_CREDENTIALS_JSON=firebase-credentials:latest,GOOGLE_APPLICATION_CREDENTIALS_JSON=google-application-credentials:latest \
+     --allow-unauthenticated
+   ```
+
+   This approach ensures that the Firebase credentials are securely stored and accessed by the application without exposing them in environment variables or embedding them in the container.
 
 ## Continuous Deployment
 
