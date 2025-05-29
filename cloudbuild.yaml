@@ -10,9 +10,10 @@ substitutions:
   _GOOGLE_CLIENT_ID: ''
   _GOOGLE_CLIENT_SECRET: ''
   _JWT_SECRET: ''
-  _GOOGLE_APPLICATION_CREDENTIALS_JSON_B64: ''
-  _FIREBASE_CREDENTIALS_JSON_B64: ''
   _GEMINI_API_KEY: ''
+  # No longer need these as we're using Secret Manager
+  # _GOOGLE_APPLICATION_CREDENTIALS_JSON_B64: ''
+  # _FIREBASE_CREDENTIALS_JSON_B64: ''
 
 # Enable explicit logging
 options:
@@ -132,46 +133,36 @@ steps:
         exit 0
       fi
       
-      # Create temporary files for the decoded credentials
-      echo "${_GOOGLE_APPLICATION_CREDENTIALS_JSON_B64}" | base64 -d > /tmp/google_creds.json
-      echo "${_FIREBASE_CREDENTIALS_JSON_B64}" | base64 -d > /tmp/firebase_creds.json
+      # Create a temporary env file for the backend with basic environment variables
+      echo "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}" > /tmp/backend.env
+      echo "GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET}" >> /tmp/backend.env
+      echo "JWT_SECRET=${_JWT_SECRET}" >> /tmp/backend.env
+      echo "GEMINI_API_KEY=${_GEMINI_API_KEY}" >> /tmp/backend.env
+      echo "ENVIRONMENT=production" >> /tmp/backend.env
+      echo "PORT=8080" >> /tmp/backend.env
+      echo "HOST=0.0.0.0" >> /tmp/backend.env
+      echo "FRONTEND_URL=https://mindmate-frontend-6xntrakg7q-nw.a.run.app" >> /tmp/backend.env
+      echo "REDIRECT_URI=https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" >> /tmp/backend.env
       
-      # Read the files with proper escaping for environment variables
-      GOOGLE_CREDS=$(cat /tmp/google_creds.json | tr '\n' ' ' | sed 's/"/\\\"/g')
-      FIREBASE_CREDS=$(cat /tmp/firebase_creds.json | tr '\n' ' ' | sed 's/"/\\\"/g')
+      # Verify Secret Manager secrets exist
+      echo "Verifying Secret Manager secrets..."
+      FIREBASE_SECRET_EXISTS=$(gcloud secrets describe firebase-credentials --project=static-concept-459810-q7 2>/dev/null && echo "true" || echo "false")
+      GOOGLE_CREDS_SECRET_EXISTS=$(gcloud secrets describe google-application-credentials --project=static-concept-459810-q7 2>/dev/null && echo "true" || echo "false")
       
-      # Remove temporary files
-      rm /tmp/google_creds.json /tmp/firebase_creds.json
+      echo "Firebase credentials secret exists: ${FIREBASE_SECRET_EXISTS}"
+      echo "Google application credentials secret exists: ${GOOGLE_CREDS_SECRET_EXISTS}"
       
-      # Deploy with environment variables
+      # Deploy with Secret Manager integration
       gcloud run deploy mindmate-backend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest \
         --platform managed \
         --memory 1Gi \
-        --set-env-vars GOOGLE_CLIENT_ID="${_GOOGLE_CLIENT_ID}",GOOGLE_CLIENT_SECRET="${_GOOGLE_CLIENT_SECRET}",JWT_SECRET="${_JWT_SECRET}",GEMINI_API_KEY="${_GEMINI_API_KEY}",FRONTEND_URL="https://mindmate-frontend-6xntrakg7q-nw.a.run.app",REDIRECT_URI="https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" \
+        --env-vars-file /tmp/backend.env \
+        --update-secrets=FIREBASE_CREDENTIALS_JSON=firebase-credentials:latest,GOOGLE_APPLICATION_CREDENTIALS_JSON=google-application-credentials:latest \
         --allow-unauthenticated
-      
-      # Create Secret Manager secrets for the JSON credentials if they don't exist
-      if ! gcloud secrets describe google-application-credentials --project static-concept-459810-q7 &>/dev/null; then
-        echo "Creating Google Application Credentials secret"
-        echo "${_GOOGLE_APPLICATION_CREDENTIALS_B64}" | base64 -d | gcloud secrets create google-application-credentials --data-file=- --project static-concept-459810-q7
-      else
-        echo "Updating Google Application Credentials secret"
-        echo "${_GOOGLE_APPLICATION_CREDENTIALS_B64}" | base64 -d | gcloud secrets versions add google-application-credentials --data-file=- --project static-concept-459810-q7
-      fi
-      
-      if ! gcloud secrets describe firebase-credentials --project static-concept-459810-q7 &>/dev/null; then
-        echo "Creating Firebase Credentials secret"
-        echo "${_FIREBASE_CREDENTIALS_JSON_B64}" | base64 -d | gcloud secrets create firebase-credentials --data-file=- --project static-concept-459810-q7
-      else
-        echo "Updating Firebase Credentials secret"
-        echo "${_FIREBASE_CREDENTIALS_JSON_B64}" | base64 -d | gcloud secrets versions add firebase-credentials --data-file=- --project static-concept-459810-q7
-      fi
-      
-      # Update the Cloud Run service to use the secrets
-      gcloud run services update mindmate-backend \
-        --add-secret=GOOGLE_APPLICATION_CREDENTIALS_JSON=google-application-credentials:latest \
-        --add-secret=FIREBASE_CREDENTIALS_JSON=firebase-credentials:latest
+        
+      # Remove the temporary env file
+      rm /tmp/backend.env
 
 images:
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest'

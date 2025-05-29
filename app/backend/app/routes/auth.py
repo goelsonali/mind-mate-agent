@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional
 import requests as req
 import json
-from ..db.firestore import save_user
+from app.db.firestore import save_user
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 security = HTTPBearer()

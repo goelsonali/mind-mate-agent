@@ -13,6 +13,7 @@ def init_firebase():
             try:
                 cred = credentials.Certificate(cred_path)
                 firebase_admin.initialize_app(cred)
+                print("Successfully initialized Firebase with credentials file")
                 return firestore.client()
             except ValueError:
                 print("Invalid credentials file, trying JSON content...")

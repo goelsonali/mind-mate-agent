@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Dict, List
 from datetime import datetime
-from ..db.firestore import update_user_mood, save_activity_rating, get_user
-from .auth import get_current_user
+from app.db.firestore import update_user_mood, save_activity_rating, get_user
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/user")
 
