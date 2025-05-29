@@ -70,15 +70,34 @@ jobs:
         DEPLOY_FRONTEND="${{ github.event.inputs.deploy_frontend || 'true' }}"
         DEPLOY_BACKEND="${{ github.event.inputs.deploy_backend || 'true' }}"
         REGION="${{ env.REGION }}"
+        
+        # Prepare non-credential secrets for Cloud Build substitutions
+        GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+        GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        JWT_SECRET="${{ secrets.JWT_SECRET }}"
+        GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+        
+        # Ensure region is set
+        if [ -z "$REGION" ]; then
+          REGION="europe-west2"
+          echo "Region not specified, defaulting to $REGION"
+        fi
+        
+        echo "Using region: $REGION"
+        
+        # Common substitutions for all deployment scenarios - no longer need to pass credentials
+        # as they are now stored in Secret Manager
+        COMMON_SUBS="_REGION=${REGION},_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID},_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET},_JWT_SECRET=${JWT_SECRET},_GEMINI_API_KEY=${GEMINI_API_KEY}"
+        
         if [[ "${DEPLOY_FRONTEND}" == "true" && "${DEPLOY_BACKEND}" == "true" ]]; then
           echo "Deploying both frontend and backend"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_REGION=${REGION}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=${COMMON_SUBS}
         elif [[ "${DEPLOY_FRONTEND}" == "true" ]]; then
           echo "Deploying frontend only"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_BACKEND=false,_REGION=${REGION}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=${COMMON_SUBS},_DEPLOY_BACKEND=false
         elif [[ "${DEPLOY_BACKEND}" == "true" ]]; then
           echo "Deploying backend only"
-          gcloud builds submit --config=cloudbuild.yaml --substitutions=_DEPLOY_FRONTEND=false,_REGION=${REGION}
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=${COMMON_SUBS},_DEPLOY_FRONTEND=false
         else
           echo "No deployment selected. Skipping."
         fi

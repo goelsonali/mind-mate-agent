@@ -6,6 +6,14 @@ substitutions:
   _DEPLOY_FRONTEND: 'true'
   _DEPLOY_BACKEND: 'true'
   _REGION: 'europe-west2'
+  # These will be provided by GitHub Actions from repository secrets
+  _GOOGLE_CLIENT_ID: ''
+  _GOOGLE_CLIENT_SECRET: ''
+  _JWT_SECRET: ''
+  _GEMINI_API_KEY: ''
+  # No longer need these as we're using Secret Manager
+  # _GOOGLE_APPLICATION_CREDENTIALS_JSON_B64: ''
+  # _FIREBASE_CREDENTIALS_JSON_B64: ''
 
 # Enable explicit logging
 options:
@@ -17,11 +25,24 @@ steps:
     entrypoint: 'bash'
     args: ['-c', 'echo "Starting Mind Mate build process for static-concept-459810-q7"']
   
+  # Verify region is set
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'verify-region'
+    waitFor: ['-']
+    script: |
+      # Ensure region is set
+      if [ -z "$_REGION" ]; then
+        echo "ERROR: Region not specified. Setting to default europe-west2"
+        export _REGION="europe-west2"
+      fi
+      echo "Using region: $_REGION"
+      gcloud config set run/region $_REGION
+
   # Frontend deployment
   # Build the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
-    waitFor: ['-']
+    waitFor: ['verify-region']
     # Skip if _DEPLOY_FRONTEND is false
     env:
       - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
@@ -30,8 +51,15 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      docker build -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest -f ./app/frontend/Dockerfile ./app/frontend
-  
+      docker build \
+        -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
+        --build-arg VITE_API_URL=https://mindmate-backend-6xntrakg7q-nw.a.run.app \
+        --build-arg VITE_APP_ENV=production \
+        --build-arg VITE_ENABLE_ANALYTICS=true \
+        --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
+        -f ./app/frontend/Dockerfile \
+        ./app/frontend
+
   # Push the frontend container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-frontend'
@@ -60,7 +88,6 @@ steps:
       fi
       gcloud run deploy mindmate-frontend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
-        --region $_REGION \
         --platform managed \
         --allow-unauthenticated
 
@@ -105,12 +132,37 @@ steps:
         echo "Skipping backend deployment as _DEPLOY_BACKEND=$_DEPLOY_BACKEND"
         exit 0
       fi
+      
+      # Create a temporary env file for the backend with basic environment variables
+      echo "GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID}" > /tmp/backend.env
+      echo "GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET}" >> /tmp/backend.env
+      echo "JWT_SECRET=${_JWT_SECRET}" >> /tmp/backend.env
+      echo "GEMINI_API_KEY=${_GEMINI_API_KEY}" >> /tmp/backend.env
+      echo "ENVIRONMENT=production" >> /tmp/backend.env
+      echo "PORT=8080" >> /tmp/backend.env
+      echo "HOST=0.0.0.0" >> /tmp/backend.env
+      echo "FRONTEND_URL=https://mindmate-frontend-6xntrakg7q-nw.a.run.app" >> /tmp/backend.env
+      echo "REDIRECT_URI=https://mindmate-backend-6xntrakg7q-nw.a.run.app/auth/google/callback" >> /tmp/backend.env
+      
+      # Verify Secret Manager secrets exist
+      echo "Verifying Secret Manager secrets..."
+      FIREBASE_SECRET_EXISTS=$(gcloud secrets describe firebase-credentials --project=static-concept-459810-q7 2>/dev/null && echo "true" || echo "false")
+      GOOGLE_CREDS_SECRET_EXISTS=$(gcloud secrets describe google-application-credentials --project=static-concept-459810-q7 2>/dev/null && echo "true" || echo "false")
+      
+      echo "Firebase credentials secret exists: ${FIREBASE_SECRET_EXISTS}"
+      echo "Google application credentials secret exists: ${GOOGLE_CREDS_SECRET_EXISTS}"
+      
+      # Deploy with Secret Manager integration
       gcloud run deploy mindmate-backend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest \
-        --region $_REGION \
         --platform managed \
         --memory 1Gi \
+        --env-vars-file /tmp/backend.env \
+        --update-secrets=FIREBASE_CREDENTIALS_JSON=firebase-credentials:latest,GOOGLE_APPLICATION_CREDENTIALS_JSON=google-application-credentials:latest \
         --allow-unauthenticated
+        
+      # Remove the temporary env file
+      rm /tmp/backend.env
 
 images:
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest'

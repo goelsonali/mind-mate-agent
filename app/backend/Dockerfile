@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
 
 # Set environment variables
 ENV PORT=8080
+ENV HOST=0.0.0.0
+ENV ENVIRONMENT=production
 ENV PYTHONUNBUFFERED=1
 
 # Copy requirements file

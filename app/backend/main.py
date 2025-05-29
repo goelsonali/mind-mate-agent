@@ -4,26 +4,57 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from agent_logic import process_user_message
 from activity_manager import get_daily_activity, rate_activity
-from models import MoodEntry
 from mood_manager import add_mood, get_mood_history, get_today_mood
 from mood_image_generator import generate_mood_collage
 from chat_manager import chat_with_user
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+
+# Initialize the app
 app = FastAPI()
+
+# Configure CORS
+origins = [
+    "http://localhost:5173",  # Frontend dev server
+    os.getenv("FRONTEND_URL", "https://mindmate-frontend-6xntrakg7q-nw.a.run.app")  # Production frontend
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace "*" with specific origins for better security
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Define the request body schema
-class ChatRequest(BaseModel):
-    user_id: str
-    message: str
+# Initialize Google Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Now import routes after FastAPI app is created
+from app.routes import chat, mood, auth, user
+from app.models import MoodEntry, ChatRequest
+
+# Authentication is now handled by the auth module
+
+# Include routers
+app.include_router(auth.router)
+app.include_router(user.router)
+app.include_router(chat.router)
+app.include_router(mood.router)
+# app.include_router(prompts.router)
+
+# Root endpoint
+@app.get("/")
+def read_root():
+    return {"message": "MindMate Backend is Running"}
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
