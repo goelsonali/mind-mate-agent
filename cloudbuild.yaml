@@ -6,6 +6,7 @@ substitutions:
   _DEPLOY_FRONTEND: 'true'
   _DEPLOY_BACKEND: 'true'
   _REGION: 'europe-west2'
+  _FRONTEND_TAG: 'latest'  # Will be overridden with timestamp during build
   # These will be provided by GitHub Actions from repository secrets
   _GOOGLE_CLIENT_ID: ''
   _GOOGLE_CLIENT_SECRET: ''
@@ -51,17 +52,30 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      # Generate a timestamp for cache busting
+      # Generate a timestamp for cache busting and unique image tagging
       TIMESTAMP=$(date +%s)
-      echo "Building frontend with cache bust timestamp: $TIMESTAMP"
+      echo "Building frontend with timestamp: $TIMESTAMP"
       
+      # Set the frontend tag substitution variable for the images section
+      export _FRONTEND_TAG=$TIMESTAMP
+      
+      # Set build environment variables for Node.js
+      export NODE_OPTIONS="--max-old-space-size=4096"
+      export ROLLUP_SKIP_NODEJS_NATIVE_BUILD=true
+      
+      # Skip native Rollup builds to avoid platform-specific issues
+      echo "Setting ROLLUP_SKIP_NODEJS_NATIVE_BUILD=true to avoid platform-specific Rollup issues"
+      
+      # Build with both a unique tag and latest tag
       docker build \
+        -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$TIMESTAMP \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
         --build-arg VITE_API_URL=https://mindmate-backend-6xntrakg7q-nw.a.run.app \
         --build-arg VITE_APP_ENV=production \
         --build-arg VITE_ENABLE_ANALYTICS=true \
         --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
         --build-arg CACHE_BUST=$TIMESTAMP \
+        --build-arg NODE_OPTIONS="--max-old-space-size=4096" \
         --no-cache \
         -f ./app/frontend/Dockerfile \
         ./app/frontend
@@ -92,8 +106,9 @@ steps:
         echo "Skipping frontend deployment as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
+      # Deploy with the timestamped tag to ensure we always get the latest version
       gcloud run deploy mindmate-frontend \
-        --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
+        --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$TIMESTAMP \
         --platform managed \
         --allow-unauthenticated
 
@@ -170,6 +185,8 @@ steps:
       # Remove the temporary env file
       rm /tmp/backend.env
 
+# Dynamic image list - will include both latest and timestamped versions
 images:
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest'
+  - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:${_FRONTEND_TAG}'
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest'
