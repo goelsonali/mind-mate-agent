@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '../context/AuthContext'
 
 const MOTIVATIONAL_QUOTES = [
   "You've survived 100% of your worst days.",
@@ -207,6 +208,7 @@ const QuoteCard = ({ onClose }) => {
 }
 
 const ActivityCard = ({ onClose }) => {
+  const { user } = useAuth()
   const randomActivity = ACTIVITY_SUGGESTIONS[Math.floor(Math.random() * ACTIVITY_SUGGESTIONS.length)]
 
   return (
@@ -229,7 +231,7 @@ const ActivityCard = ({ onClose }) => {
         marginBottom: 'var(--spacing-md)',
         color: 'var(--color-text-accent)'
       }}>
-        Suggested Activity
+        {user?.name ? `${user.name}, here's a suggested activity` : 'Suggested Activity'}
       </h3>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -262,6 +264,8 @@ const ActivityCard = ({ onClose }) => {
 }
 
 const ClosingMessage = ({ onReset }) => {
+  const { user } = useAuth()
+
   return (
     <motion.div
       className="card"
@@ -284,7 +288,9 @@ const ClosingMessage = ({ onReset }) => {
           marginBottom: 'var(--spacing-lg)'
         }}
       >
-        Thank you for checking in. I'm always here when you need to talk.
+        {user?.name 
+          ? `Thank you for checking in, ${user.name}. I'm always here when you need to talk.`
+          : "Thank you for checking in. I'm always here when you need to talk."}
       </motion.p>
       <motion.button
         className="button"
@@ -306,6 +312,7 @@ const ClosingMessage = ({ onReset }) => {
 }
 
 const PostChatSuggestions = ({ onClose, onReset }) => {
+  const { user } = useAuth()
   const [activeModal, setActiveModal] = useState(null)
   const [showClosingMessage, setShowClosingMessage] = useState(false)
 
@@ -342,7 +349,9 @@ const PostChatSuggestions = ({ onClose, onReset }) => {
           color: 'var(--color-text-accent)',
           textAlign: 'center'
         }}>
-          Thank you for sharing. Would you like to try one of these self-care activities?
+          {user?.name 
+            ? `${user.name}, would you like to try one of these self-care activities?`
+            : "Thank you for sharing. Would you like to try one of these self-care activities?"}
         </h3>
         <div style={{
           display: 'grid',

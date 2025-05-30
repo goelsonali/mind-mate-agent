@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fetchChatResponse } from "../api/api"
 import PostChatSuggestions from './PostChatSuggestions'
+import { useAuth } from '../context/AuthContext'
 
 const SAMPLE_MESSAGES = [
   { text: "Hi, I'm MindMate! How can I support you today?", sender: 'ai' }
@@ -10,7 +11,10 @@ const SAMPLE_MESSAGES = [
 const INACTIVITY_TIMEOUT = 30000 // 30 seconds of inactivity before showing suggestions
 
 const ChatBox = () => {
-  const [messages, setMessages] = useState(SAMPLE_MESSAGES)
+  const { user } = useAuth()
+  const [messages, setMessages] = useState([
+    { text: user?.name ? `Hi ${user.name}, how can I support you today?` : "Hi, I'm MindMate! How can I support you today?", sender: 'ai' }
+  ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -66,7 +70,9 @@ const ChatBox = () => {
   }, [showSuggestions, messages.length])
 
   const handleReset = () => {
-    setMessages(SAMPLE_MESSAGES)
+    setMessages([
+      { text: user?.name ? `Hi ${user.name}, how can I support you today?` : "Hi, I'm MindMate! How can I support you today?", sender: 'ai' }
+    ])
     setInput('')
     setIsTyping(false)
     setShowSuggestions(false)
