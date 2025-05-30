@@ -39,7 +39,7 @@ steps:
       gcloud config set run/region $_REGION
 
   # Frontend deployment
-# Build the frontend container image
+  # Build the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
     waitFor: ['verify-region']
@@ -51,31 +51,29 @@ steps:
         exit 0
       fi
       
-      # Use timestamp for unique builds (not just date)
-      FRONTEND_TAG="$(date +%Y%m%d-%H%M%S)-${SHORT_SHA}"
-      echo "Building frontend with unique tag: $FRONTEND_TAG"
+      # Simple timestamp-based tag
+      TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+      FRONTEND_TAG="build-${TIMESTAMP}"
+      echo "Building frontend with tag: $FRONTEND_TAG"
       
-      # Create a file with the tag that can be read by other steps
+      # Save tag for other steps
       echo "$FRONTEND_TAG" > /workspace/frontend_tag.txt
       
-      # Build with unique tag
+      # Build the image
       docker build \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
         --build-arg VITE_API_URL=https://mindmate-backend-6xntrakg7q-nw.a.run.app \
         --build-arg VITE_APP_ENV=production \
-        --build-arg VITE_ENABLE_ANALYTICS=true \
-        --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
-        --build-arg CACHE_BUST=$FRONTEND_TAG \
+        --build-arg CACHE_BUST=$TIMESTAMP \
         --no-cache \
         -f ./app/frontend/Dockerfile \
         ./app/frontend
 
-  # Push the frontend container image to Container Registry
+  # Push the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-frontend'
     waitFor: ['build-frontend']
-    # Only run if _DEPLOY_FRONTEND is true
     env:
       - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
     script: |
@@ -83,15 +81,17 @@ steps:
         echo "Skipping frontend push as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      # Push both the date-tagged and latest images
+      
+      FRONTEND_TAG=$(cat /workspace/frontend_tag.txt)
+      echo "Pushing frontend with tag: $FRONTEND_TAG"
+      
       docker push europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG
       docker push europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest
-  
-  # Deploy frontend container image to Cloud Run
+
+  # Deploy frontend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-frontend'
     waitFor: ['push-frontend']
-    # Only run if _DEPLOY_FRONTEND is true
     env:
       - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
     script: |
@@ -99,15 +99,16 @@ steps:
         echo "Skipping frontend deployment as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      # Read the frontend tag from the file created in the build step
+      
       FRONTEND_TAG=$(cat /workspace/frontend_tag.txt)
       echo "Deploying frontend with tag: $FRONTEND_TAG"
       
-      # Deploy with the timestamped tag to ensure we always get the latest version
       gcloud run deploy mindmate-frontend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG \
         --platform managed \
-        --allow-unauthenticated
+        --region $_REGION \
+        --allow-unauthenticated \
+        --quiet
 
   # Backend deployment
   # Build the backend container image
