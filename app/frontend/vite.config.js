@@ -5,16 +5,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Disable SSR which can cause crypto issues
+    // Re-enable content hashing for cache busting
     ssr: false,
-    // Disable content hash to avoid crypto dependency
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        // Disable hash in filenames to avoid crypto dependency
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name].[ext]'
+        // Use build timestamp or content hash for cache busting
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   },

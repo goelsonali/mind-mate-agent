@@ -39,11 +39,10 @@ steps:
       gcloud config set run/region $_REGION
 
   # Frontend deployment
-  # Build the frontend container image
+# Build the frontend container image
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
     waitFor: ['verify-region']
-    # Skip if _DEPLOY_FRONTEND is false
     env:
       - '_DEPLOY_FRONTEND=$_DEPLOY_FRONTEND'
     script: |
@@ -51,24 +50,15 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      # Use the current date as a fixed tag for the frontend image
-      CURRENT_DATE=$(date +%Y%m%d)
-      echo "Building frontend with date tag: $CURRENT_DATE"
       
-      # Use a fixed tag for the frontend image
-      FRONTEND_TAG="$CURRENT_DATE"
+      # Use timestamp for unique builds (not just date)
+      FRONTEND_TAG="$(date +%Y%m%d-%H%M%S)-${SHORT_SHA}"
+      echo "Building frontend with unique tag: $FRONTEND_TAG"
       
       # Create a file with the tag that can be read by other steps
       echo "$FRONTEND_TAG" > /workspace/frontend_tag.txt
       
-      # Set build environment variables for Node.js
-      export NODE_OPTIONS="--max-old-space-size=4096"
-      export ROLLUP_SKIP_NODEJS_NATIVE_BUILD=true
-      
-      # Skip native Rollup builds to avoid platform-specific issues
-      echo "Setting ROLLUP_SKIP_NODEJS_NATIVE_BUILD=true to avoid platform-specific Rollup issues"
-      
-      # Build with both a date tag and latest tag
+      # Build with unique tag
       docker build \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
@@ -77,7 +67,6 @@ steps:
         --build-arg VITE_ENABLE_ANALYTICS=true \
         --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
         --build-arg CACHE_BUST=$FRONTEND_TAG \
-        --build-arg NODE_OPTIONS="--max-old-space-size=4096" \
         --no-cache \
         -f ./app/frontend/Dockerfile \
         ./app/frontend
