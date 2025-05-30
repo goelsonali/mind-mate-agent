@@ -78,7 +78,7 @@ const HowItWorks = () => {
             lineHeight: 1.5,
             fontFamily: 'var(--font-family-primary)'
           }}>
-            Discover how MindMate helps you reflect, relax, and recharge.
+            Discover how MindMate helps you reflect, relax, and recharge.🌿
           </h3>
         </motion.div>
 

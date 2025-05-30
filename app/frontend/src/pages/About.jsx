@@ -252,7 +252,7 @@ const About = () => {
               fontWeight: 500
             }}
           >
-            "Your feelings are valid. Your story matters. And you're not alone."
+            "Your feelings are valid. Your story matters. And you're not alone.🤍"
           </motion.blockquote>
         </motion.div>
 
