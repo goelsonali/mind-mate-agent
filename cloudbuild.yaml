@@ -106,7 +106,7 @@ steps:
       gcloud run deploy mindmate-frontend \
         --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG \
         --platform managed \
-        --region $_REGION \
+        --region europe-west2 \
         --allow-unauthenticated \
         --quiet
 
