@@ -10,8 +10,15 @@ COPY package*.json ./
 RUN npm config set registry https://registry.npmjs.org/ && \
     npm ci --prefer-offline --no-audit --progress=false
 
-# Copy the rest of the application code
-COPY . .
+# Copy public assets and configuration files first
+COPY public/ ./public/
+COPY vite.config.js tsconfig*.json ./
+
+# Add a build argument for cache busting
+ARG CACHE_BUST=unknown
+
+# Copy source code (most likely to change)
+COPY src/ ./src/
 
 # Set environment variables
 # API Configuration

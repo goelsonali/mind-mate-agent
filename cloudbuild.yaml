@@ -51,12 +51,18 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
+      # Generate a timestamp for cache busting
+      TIMESTAMP=$(date +%s)
+      echo "Building frontend with cache bust timestamp: $TIMESTAMP"
+      
       docker build \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
         --build-arg VITE_API_URL=https://mindmate-backend-6xntrakg7q-nw.a.run.app \
         --build-arg VITE_APP_ENV=production \
         --build-arg VITE_ENABLE_ANALYTICS=true \
         --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
+        --build-arg CACHE_BUST=$TIMESTAMP \
+        --no-cache \
         -f ./app/frontend/Dockerfile \
         ./app/frontend
 
