@@ -28,6 +28,7 @@ const steps = [
   }
 ]
 
+
 const HowItWorks = () => {
   return (
     <motion.div
@@ -55,7 +56,7 @@ const HowItWorks = () => {
             textAlign: 'center'
           }}
         >
-          <motion.h1 
+          <motion.h1
             style={{
               fontSize: '2.5rem',
               marginBottom: 'var(--spacing-md)',
@@ -78,9 +79,10 @@ const HowItWorks = () => {
             lineHeight: 1.5,
             fontFamily: 'var(--font-family-primary)'
           }}>
-            Discover how MindMate helps you reflect, relax, and recharge.
+            Discover how MindMate helps you reflect, relax, and recharge.🌿
           </h3>
         </motion.div>
+
 
         <div style={{
           display: 'grid',
@@ -94,7 +96,7 @@ const HowItWorks = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 + index * 0.1 }}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.02,
                 boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
               }}
@@ -152,6 +154,7 @@ const HowItWorks = () => {
           ))}
         </div>
 
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -178,6 +181,7 @@ const HowItWorks = () => {
             "One small check-in a day can make a big difference."
           </blockquote>
         </motion.div>
+
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -221,4 +225,5 @@ const HowItWorks = () => {
   )
 }
 
-export default HowItWorks 
+
+export default HowItWorks

@@ -28,7 +28,7 @@ const About = () => {
             textAlign: 'center'
           }}
         >
-          <motion.h1 
+          <motion.h1
             style={{
               fontSize: '2.5rem',
               marginBottom: 'var(--spacing-md)',
@@ -55,11 +55,12 @@ const About = () => {
           </h3>
         </motion.div>
 
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.01,
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
           }}
@@ -93,11 +94,12 @@ const About = () => {
           </p>
         </motion.div>
 
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.01,
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
           }}
@@ -148,8 +150,8 @@ const About = () => {
                   lineHeight: 1.5
                 }}
               >
-                <span style={{ 
-                  color: '#7CAEFF', 
+                <span style={{
+                  color: '#7CAEFF',
                   fontSize: '1.5rem',
                   filter: 'drop-shadow(0 0 8px rgba(124, 174, 255, 0.3))'
                 }}>✓</span>
@@ -159,11 +161,12 @@ const About = () => {
           </ul>
         </motion.div>
 
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.01,
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
           }}
@@ -198,11 +201,12 @@ const About = () => {
           </p>
         </motion.div>
 
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
-          whileHover={{ 
+          whileHover={{
             scale: 1.01,
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
           }}
@@ -252,9 +256,10 @@ const About = () => {
               fontWeight: 500
             }}
           >
-            "Your feelings are valid. Your story matters. And you're not alone."
+            "Your feelings are valid. Your story matters. And you're not alone.🤍"
           </motion.blockquote>
         </motion.div>
+
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -299,4 +304,5 @@ const About = () => {
   )
 }
 
-export default About 
+
+export default About
