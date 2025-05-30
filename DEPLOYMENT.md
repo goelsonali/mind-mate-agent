@@ -272,16 +272,3 @@ Set up a Cloud Build trigger to automatically deploy when you push to your repos
 4. Specify the build configuration file (cloudbuild.yaml)
 5. Set the trigger event (e.g., push to main branch)
 
-## Cost Considerations
-
-As mentioned in your architecture document, GCP's free tier provides:
-- **Cloud Run**: Free tier includes 2M requests/month and 360K GB-seconds/month
-- **Firestore**: Free tier includes 1GB storage and 50K reads/writes per day
-- **Cloud Functions**: Free tier includes 2M invocations/month
-- **Vertex AI**: Free credits available for new accounts
-- **Gemini API**: Limited free tier available
-
-Estimated costs for minimal viable product:
-- Development/Testing phase: $0-$10/month with free tier
-- Initial production with small user base: $50-$150/month
-- Scaled production: Variable based on user activity
