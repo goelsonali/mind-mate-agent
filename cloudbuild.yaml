@@ -56,7 +56,12 @@ steps:
       TIMESTAMP=$(date +%s)
       echo "Building frontend with timestamp: $TIMESTAMP"
       
-      # Set the frontend tag substitution variable for the images section
+      # Set the frontend tag substitution variable globally
+      # This creates a file that will be read by subsequent steps
+      echo "$TIMESTAMP" > /workspace/frontend_tag.txt
+      cat /workspace/frontend_tag.txt
+      
+      # Update the _FRONTEND_TAG substitution for this step
       export _FRONTEND_TAG=$TIMESTAMP
       
       # Set build environment variables for Node.js
@@ -106,9 +111,13 @@ steps:
         echo "Skipping frontend deployment as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
+      # Read the frontend tag from the file created in the build step
+      FRONTEND_TAG=$(cat /workspace/frontend_tag.txt)
+      echo "Deploying frontend with tag: $FRONTEND_TAG"
+      
       # Deploy with the timestamped tag to ensure we always get the latest version
       gcloud run deploy mindmate-frontend \
-        --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$TIMESTAMP \
+        --image europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG \
         --platform managed \
         --allow-unauthenticated
 
@@ -185,8 +194,7 @@ steps:
       # Remove the temporary env file
       rm /tmp/backend.env
 
-# Dynamic image list - will include both latest and timestamped versions
+# Images to be pushed to the container registry
 images:
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest'
-  - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:${_FRONTEND_TAG}'
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest'
