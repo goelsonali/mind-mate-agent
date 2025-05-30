@@ -10,12 +10,17 @@ COPY package*.json ./
 RUN npm config set registry https://registry.npmjs.org/ && \
     npm ci --prefer-offline --no-audit --progress=false
 
-# Copy public assets and configuration files first
-COPY public/ ./public/
+# Copy index.html first (this is the entry point for Vite)
+COPY index.html ./
+
+# Copy configuration files
 COPY vite.config.js tsconfig*.json ./
 
 # Add a build argument for cache busting
 ARG CACHE_BUST=unknown
+
+# Copy public assets
+COPY public/ ./public/
 
 # Copy source code (most likely to change)
 COPY src/ ./src/
@@ -35,8 +40,12 @@ ENV VITE_APP_ENV=${VITE_APP_ENV:-"production"}
 ARG VITE_ENABLE_ANALYTICS
 ENV VITE_ENABLE_ANALYTICS=${VITE_ENABLE_ANALYTICS:-"true"}
 
-# Build the application
+# Build the application with optimized settings
 ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV ROLLUP_SKIP_NODEJS_NATIVE_BUILD=true
+
+# Run the build with increased memory and skipping native modules
 RUN npm run build
 
 # Production stage with Nginx
