@@ -3,6 +3,8 @@ Mind-Mate is an AI-powered application designed to support mental health through
 
 Access the application [here](https://mindmate-frontend-6xntrakg7q-nw.a.run.app/) 
 
+[Demo of our vision](https://youtu.be/YGvHOv5sngU) 
+
 ![image](https://github.com/user-attachments/assets/a5ab2dff-4d32-42aa-b593-d845bfe2ed79)
 
 
@@ -53,6 +55,8 @@ This project is configured to deploy to Google Cloud Platform (GCP) using Cloud 
 This project was developed by a team of six members. Team members and their contributions are as follows:
 
 **Team Members:**
+
+![project_team](https://github.com/user-attachments/assets/02d72b8e-87dd-4bfe-b535-36732702b856)
 
 - **Sonali Goel** (Team Lead | Backend Engineer) | [Website](https://sonaligoel.carrd.co/) | [GitHub](https://github.com/goelsonali) | [LinkedIn](https://www.linkedin.com/in/sonali-goel-tech/) | 
 - **Arzu Caner** (Frontend Developer) | [GitHub](https://github.com/arzucaner) | [LinkedIn](https://www.linkedin.com/in/arzucaner/) | [YouTube](@Codearz) |
