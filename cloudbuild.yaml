@@ -52,17 +52,15 @@ steps:
         echo "Skipping frontend build as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
-      # Generate a timestamp for cache busting and unique image tagging
-      TIMESTAMP=$(date +%s)
-      echo "Building frontend with timestamp: $TIMESTAMP"
+      # Use the current date as a fixed tag for the frontend image
+      CURRENT_DATE=$(date +%Y%m%d)
+      echo "Building frontend with date tag: $CURRENT_DATE"
       
-      # Set the frontend tag substitution variable globally
-      # This creates a file that will be read by subsequent steps
-      echo "$TIMESTAMP" > /workspace/frontend_tag.txt
-      cat /workspace/frontend_tag.txt
+      # Use a fixed tag for the frontend image
+      FRONTEND_TAG="$CURRENT_DATE"
       
-      # Update the _FRONTEND_TAG substitution for this step
-      export _FRONTEND_TAG=$TIMESTAMP
+      # Create a file with the tag that can be read by other steps
+      echo "$FRONTEND_TAG" > /workspace/frontend_tag.txt
       
       # Set build environment variables for Node.js
       export NODE_OPTIONS="--max-old-space-size=4096"
@@ -71,9 +69,9 @@ steps:
       # Skip native Rollup builds to avoid platform-specific issues
       echo "Setting ROLLUP_SKIP_NODEJS_NATIVE_BUILD=true to avoid platform-specific Rollup issues"
       
-      # Build with both a unique tag and latest tag
+      # Build with both a date tag and latest tag
       docker build \
-        -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$TIMESTAMP \
+        -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG \
         -t europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest \
         --build-arg VITE_API_URL=https://mindmate-backend-6xntrakg7q-nw.a.run.app \
         --build-arg VITE_APP_ENV=production \
@@ -97,6 +95,8 @@ steps:
         echo "Skipping frontend push as _DEPLOY_FRONTEND=$_DEPLOY_FRONTEND"
         exit 0
       fi
+      # Push both the date-tagged and latest images
+      docker push europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:$FRONTEND_TAG
       docker push europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest
   
   # Deploy frontend container image to Cloud Run
@@ -195,6 +195,7 @@ steps:
       rm /tmp/backend.env
 
 # Images to be pushed to the container registry
+# Note: The date-tagged image will be dynamically added during the build
 images:
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/frontend:latest'
   - 'europe-west2-docker.pkg.dev/static-concept-459810-q7/mindmate/backend:latest'
