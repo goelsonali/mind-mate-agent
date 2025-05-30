@@ -6,7 +6,6 @@ substitutions:
   _DEPLOY_FRONTEND: 'true'
   _DEPLOY_BACKEND: 'true'
   _REGION: 'europe-west2'
-  _FRONTEND_TAG: 'latest'  # Will be overridden with timestamp during build
   # These will be provided by GitHub Actions from repository secrets
   _GOOGLE_CLIENT_ID: ''
   _GOOGLE_CLIENT_SECRET: ''
@@ -77,7 +76,7 @@ steps:
         --build-arg VITE_APP_ENV=production \
         --build-arg VITE_ENABLE_ANALYTICS=true \
         --build-arg VITE_GEMINI_API_KEY=${_GEMINI_API_KEY} \
-        --build-arg CACHE_BUST=$TIMESTAMP \
+        --build-arg CACHE_BUST=$FRONTEND_TAG \
         --build-arg NODE_OPTIONS="--max-old-space-size=4096" \
         --no-cache \
         -f ./app/frontend/Dockerfile \
