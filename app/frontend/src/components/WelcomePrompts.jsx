@@ -32,7 +32,7 @@ const WelcomePrompts = ({ onComplete }) => {
   const [typedText, setTypedText] = useState('')
   const [responses, setResponses] = useState({})
   const [savingResponses, setSavingResponses] = useState(false)
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, updateUser } = useAuth()
 
   // Add a separate effect to log authentication status for debugging
   useEffect(() => {
@@ -174,15 +174,21 @@ const WelcomePrompts = ({ onComplete }) => {
     }
   }
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
     // Save the current answer to responses object
     if (prompts[currentPrompt]) {
-      setResponses(prev => ({
-        ...prev,
+      const currentResponse = {
+        ...responses,
         [prompts[currentPrompt]]: answer
-      }))
+      }
+      setResponses(currentResponse)
+
+      // If this is the name prompt, update the user's name
+      if (prompts[currentPrompt] === "What's your name?" && answer.trim()) {
+        updateUser({ ...user, name: answer.trim() })
+      }
     }
     
     if (currentPrompt < prompts.length - 1) {

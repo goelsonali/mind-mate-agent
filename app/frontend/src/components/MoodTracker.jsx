@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Line } from 'react-chartjs-2'
+import { useAuth } from '../context/AuthContext'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,6 +47,7 @@ const SAMPLE_HISTORY = [
 ]
 
 const MoodTracker = ({ setMood }) => {
+  const { user } = useAuth()
   const [selectedMood, setSelectedMood] = useState(null)
   const [moodHistory, setMoodHistory] = useState(SAMPLE_HISTORY)
   const [isOffline, setIsOffline] = useState(false)
@@ -215,7 +217,7 @@ const MoodTracker = ({ setMood }) => {
           textAlign: 'center'
         }}
       >
-        How are you feeling today?
+        {user?.name ? `How are you feeling today, ${user.name}?` : "How are you feeling today?"}
       </motion.h2>
 
       <motion.p
@@ -229,7 +231,9 @@ const MoodTracker = ({ setMood }) => {
           fontSize: '1.1rem'
         }}
       >
-        It's okay to feel different every day. Let's keep tracking together.
+        {user?.name 
+          ? `${user.name}, it's okay to feel different every day. Let's keep tracking together.`
+          : "It's okay to feel different every day. Let's keep tracking together."}
       </motion.p>
       
       {isOffline && null}
